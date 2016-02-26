@@ -4,6 +4,12 @@ var coapNode = new CoapNode('nodeTest');
 
 coapNode.on('ready', function (msg) {
     console.log('ready');
+
+    setInterval(function () {
+        coapNode._dumpObj(3303, 0, function (err, data) {
+            console.log(data);
+        });
+    }, 30000);
 });
 
 coapNode.on('close', function (msg) {
@@ -17,11 +23,24 @@ coapNode.on('update', function (msg) {
 coapNode.initResrc(3303, 0, {
     5700: 21,
     5701: 'C',
-    5702: {'a': 1, 'b': 2},
-    5703: { exec: function (val1, val2, cb) {
-        console.log(val1 + val2);
-        cb(null, 'good');
-    }}
+    5702: { 
+        read: function (cb) {
+            var time = new Date();
+            cb(null, time.toString());
+        }
+    },
+    5703: { 
+        write: function (val, cb) {
+            console.log('write ' + val);
+            cb(null, val);
+        }
+    },
+    5704: { 
+        exec: function (val1, val2, cb) {
+            console.log(val1 + val2);
+            cb(null, 'good');
+        }
+    }
 });
 
 coapNode.initResrc(3303, 1, {
@@ -30,5 +49,6 @@ coapNode.initResrc(3303, 1, {
 });
 
 coapNode.register('127.0.0.1', 5683, function (err, msg) {
-    console.log(msg);
+
 });
+
