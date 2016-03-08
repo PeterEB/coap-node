@@ -10,7 +10,9 @@
     "network": "^0.1.3",
     "q": "^1.4.1"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "should": "^7.1.1"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
