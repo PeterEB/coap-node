@@ -5,11 +5,11 @@ var coapNode = new CoapNode('nodeTest');
 coapNode.on('ready', function (msg) {
     console.log('ready');
 
-    setInterval(function () {
-        coapNode._dumpObj(3303, 0, function (err, data) {
-            console.log(data);
-        });
-    }, 30000);
+    // setInterval(function () {
+    //     coapNode._dumpObj(3303, 0, function (err, data) {
+    //         console.log(data);
+    //     });
+    // }, 30000);
 });
 
 coapNode.on('close', function (msg) {
@@ -43,21 +43,19 @@ coapNode.initResrc(3303, 0, {
     }
 });
 
-
-
 coapNode.register('127.0.0.1', 5683, function (err, msg) {
     console.log(msg.status);
 });
 
-// setTimeout(function () {
-//     coapNode.initResrc(3303, 1, {
-//         5700: 89,
-//         5701: 'F'
-//     });
-// }, 10000);
+setTimeout(function () {
+    coapNode.initResrc(3303, 1, {
+        5700: 89,
+        5701: 'F'
+    });
+}, 10000);
 
-// setTimeout(function () {
-//     coapNode.setDevAttrs({}, function (err, msg) {
-//         console.log(msg);
-//     });
-// }, 20000);
+setTimeout(function () {
+    coapNode.setDevAttrs({}, function (err, msg) {
+        console.log(msg);
+    });
+}, 20000);
