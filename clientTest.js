@@ -42,17 +42,22 @@ coapNode.initResrc(3303, 0, {
     }
 });
 
+coapNode.initResrc(3303, 1, {
+    5700: 89,
+    5701: 'F'
+});
+
 coapNode.register('127.0.0.1', 5683, function (err, msg) {
     console.log(msg);
 });
 
-setTimeout(function () {
-    coapNode.initResrc(3303, 1, {
-        5700: 89,
-        5701: 'F'
-    });
+// setTimeout(function () {
+//     coapNode.initResrc(3303, 1, {
+//         5700: 89,
+//         5701: 'F'
+//     });
 
-    coapNode.setDevAttrs({}, function (err, msg) {
-        console.log(msg);
-    });
-}, 10000);
+//     coapNode.setDevAttrs({}, function (err, msg) {
+//         console.log(msg);
+//     });
+// }, 40000);
