@@ -2,12 +2,12 @@ var CoapNode = require('./lib/coap-node.js');
 
 var coapNode = new CoapNode('nodeTest');
 
-coapNode.on('registed', function () {
-    console.log('registed');
+coapNode.on('registered', function () {
+    console.log('registered');
 });
 
-coapNode.on('deregisted', function (msg) {
-    console.log('deregisted');
+coapNode.on('deregistered', function (msg) {
+    console.log('deregistered');
 });
 
 coapNode.on('update', function (msg) {
@@ -45,6 +45,7 @@ coapNode.initResrc(3303, 1, {
 coapNode.register('127.0.0.1', 5683, function (err, msg) {
     console.log(msg);
 });
+
 
 // setDevAttrs test
 // setTimeout(function () {
