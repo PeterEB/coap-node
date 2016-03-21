@@ -14,6 +14,10 @@ coapNode.on('update', function (msg) {
     console.log('update');
 });
 
+coapNode.on('announce', function (msg) {
+    console.log('announce: ' + msg);
+});
+
 coapNode.initResrc(3303, 0, {
     sensorValue: 21,
     units: 'C',
@@ -48,11 +52,11 @@ coapNode.register('127.0.0.1', 5683, function (err, msg) {
 
 
 // setDevAttrs test
-// setTimeout(function () {
-//     coapNode.setDevAttrs({ lifetime: 85741 }, function (err, msg) {
-//         console.log(msg);
-//     });
-// }, 10000);
+setTimeout(function () {
+    coapNode.setDevAttrs({ lifetime: 85741 }, function (err, msg) {
+        console.log(msg);
+    });
+}, 15000);
 
 // update test
 // setTimeout(function () {
@@ -62,8 +66,8 @@ coapNode.register('127.0.0.1', 5683, function (err, msg) {
 // }, 20000);
 
 // deregister test
-// setTimeout(function () {
-//     coapNode.deregister(function (err, msg) {
-//         console.log(msg);
-//     });
-// }, 30000);
+setTimeout(function () {
+    coapNode.deregister(function (err, msg) {
+        console.log(msg);
+    });
+}, 30000);
