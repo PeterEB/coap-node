@@ -42,7 +42,7 @@ coapNode.initResrc(3303, 0, {
 });
 
 coapNode.initResrc(3303, 1, {
-    5700: 89,
+    5700: 70,
     5701: 'F'
 });
 
