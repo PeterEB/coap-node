@@ -50,6 +50,18 @@ coapNode.register('127.0.0.1', 5683, function (err, msg) {
     console.log(msg);
 });
 
+// setTimeout(function () {
+//     coapNode.register('127.0.0.1', 5683, function (err, msg) {
+//         console.log(msg);
+//     });
+// }, 5000);
+
+// setTimeout(function () {
+//     coapNode.register('127.0.0.1', 5683, function (err, msg) {
+//         console.log(msg);
+//     });
+// }, 10000);
+
 
 // setDevAttrs test
 setTimeout(function () {
@@ -65,9 +77,9 @@ setTimeout(function () {
 //     });
 // }, 20000);
 
-// deregister test
-setTimeout(function () {
-    coapNode.deregister(function (err, msg) {
-        console.log(msg);
-    });
-}, 30000);
+// // deregister test
+// setTimeout(function () {
+//     coapNode.deregister(function (err, msg) {
+//         console.log(msg);
+//     });
+// }, 30000);
