@@ -10,6 +10,22 @@ module.exports = {
     // default is udp4.
     connectionType: 'udp4',
 
+    // the registration should be removed by the Server if a new registration or update is not received within this lifetime. 
+    // default is 86400 secs.
+    lifetime: 86400,
+
+    // minimum supported LWM2M version
+    version: '1.0.0',
+
+    // Minimum time in seconds the Client Device should wait between two notifications.
+    // default is 1 secs.
+    defaultMinPeriod: 1,
+
+    // Maximum Period. Maximum time in seconds the Client Device should wait between two notifications. 
+    // When maximum time expires after the last notification, a new notification should be sent.
+    // default is 60 secs.
+    defaultMaxPeriod: 60,
+
     // request should get response in the time.
     // default is 60 secs.
     reqTimeout: 60,
@@ -21,5 +37,4 @@ module.exports = {
     // how often to check the socket is not used.
     // default is 60 secs.
     serverChkTime: 60
-
 };

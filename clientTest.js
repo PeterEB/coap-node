@@ -10,8 +10,8 @@ coapNode.on('deregistered', function (msg) {
     console.log('deregistered');
 });
 
-coapNode.on('update', function (msg) {
-    console.log('update');
+coapNode.on('updated', function (msg) {
+    console.log('updated');
 });
 
 coapNode.on('announce', function (msg) {
