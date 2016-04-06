@@ -91,7 +91,7 @@ cnode.write('/temperature/1/sensorValue', function (err, msg) {
 <a name="Resources"></a>
 ## 5. Resources Planning
 
-The great benefit of using this module is that **coap-node** will handle responds to the requests from the Server, as long as your Resources is planning well. So all you need to do is using API `initResrc(oid, iid, resrcs)` to initialize Resources as you need on Device, where `oid` and `iid` are the Object id and Object Instance id. `resrcs` is an object containing all Resources under the Object Instance. In `resrcs` object, each key is `rid` and its corresponding value is the Resource value. 
+The great benefit of using this module is that **coap-node** will handle responds to the requests from the Server, as long as your Resources is planning well. So all you need to do is using API `initResrc(oid, iid, resrcs)` to initialize Resources as you need on the Device, where `oid` and `iid` are the Object id and Object Instance id. `resrcs` is an object containing all Resources under the Object Instance. In `resrcs` object, each key is `rid` and its corresponding value is the Resource value. 
 
 Resource value can be 
 
@@ -110,7 +110,7 @@ The following description will tell you how to build them.
 <a name="Resource_simple"></a>
 ### Initialize Resource as a definitely value
 
-The most common Resource is a simple value. It can be a number, a string or a boolean. The following example is a temperature Object with Resources sensorValue and units:
+The most common Resource is a simple value. It can be a number, a string or a boolean. The following example is a temperature Object with Resources 'sensorValue' and 'units':
 
 ```js
 cnode.initResrc('temperature', 0, {
@@ -119,7 +119,7 @@ cnode.initResrc('temperature', 0, {
 });
 ```
 
-If you want to change the Resource value, you need to use API `writeResrc(oid, iid, rid, val)`. The following example is write to Resources sensorValue:
+If you want to change the Resource value, you need to use API `writeResrc(oid, iid, rid, val)`. The following example show you how to write Resources 'sensorValue':
 
 ```js
 var tempVal = gpio.read('gpio0');
@@ -186,7 +186,7 @@ cnode.initResrc('lightCtrl', 0, {
 <a name="Resource_executable"></a>
 ### Initialize Resource with exec method
 
-Finally, an executable Resource. Executable Resource allows Server to remotely call a procedure on the Device. You can define some procedure calls of you need in executable Resource. In this plan, the signature of `write` method is `function (..., cb)`, the number of arguments depends on your own definition. The `cb(status, data)` is a callback function that you should call, where `status` is respond code to the requests from the Server. If procedure operation successfully, you should be given `status` 'null' or '2.04'(Changed); If any error occurs in procedure, you can given `status` '4.00'(Bad Request) or your own definition. Here is an exmaple:
+Finally, an executable Resource. Executable Resource allows Server to remotely call a procedure on the Device. You can define some procedure calls of you need in executable Resource. In this plan, the signature of `write` method is `function (..., cb)`, the number of arguments depends on your own definition. The `cb(status, data)` is a callback function that you should call, where `status` is the respond code to the requests from the Server. If the procedure operates successfully, you should give `status` 'null' or '2.04'(Changed). If any error occurs during the procedure, you should give `status` '4.00'(Bad Request) or your own definition. Here is an exmaple:
 
 ```js
 function blinkLed (led, time) {
@@ -208,7 +208,7 @@ cnode.initResrc('led', 0, {
 });
 ```
 
-If the Server request to read or write executable Resource, it will get a status code of '4.05'(Method Not Allowed). In contrast, If the Server request to execute a Resource that is not executable, it also get a status code of '4.05'(Method Not Allowed).
+If the Server request to read or write an executable Resource, it will get a status code of '4.05'(Method Not Allowed). In contrast, If the Server request to execute a Resource that is not executable, it also get a status code of '4.05'(Method Not Allowed).
 
 <a name="APIs"></a>
 ## 6. APIs and Events
@@ -232,9 +232,9 @@ Create a new instance of CoapNode class.
 
 **Arguments:**  
 
-1. `clientName` (_String_): the name of Client device, it should be unique in the network. 
+1. `clientName` (_String_): the name of Client Device, it should be unique in the network. 
 
-2. `devAttrs` (_Object_): describe information about the device. The following table shows the details of each property within devAttrs.
+2. `devAttrs` (_Object_): describe information about the Device. The following table shows the details of each property within devAttrs.
 
     |  Property  | Type   | Required | Description |
     |------------|--------|----------|-------------|
