@@ -72,7 +72,7 @@ setTimeout(function () {
 
 // update test
 // setTimeout(function () {
-//     coapNode.update({ lifetime: 86400 }, function (err, msg) {
+//     coapNode._update({ lifetime: 86400 }, function (err, msg) {
 //         console.log(msg);
 //     });
 // }, 20000);
