@@ -42,11 +42,11 @@ coap-node
 <a name="Usage"></a>
 ## 4. Usage
 
-Client-side exmaple (the following example is how to use `coap-node` on a machine node):
+Client-side exmaple (the following example shows how you use `coap-node` on a machine node):
 
 ```js
 var CoapNode = require('coap-node');
-var cnode = new CoapNode('foo_name');
+var cnode = new CoapNode('my_first_node');
 
 // initialize your Resources
 // oid = 'temperature', iid = 0
@@ -63,10 +63,11 @@ cnode.initResrc('temperature', 1, {
 
 cnode.on('registered', function () {
     // If the registration procedure completes successfully, 'registered' will be fired
-    // do your application here
+
+    // start your application
 });
 
-// register to a Server with the server ip and port
+// register to a Server with its ip and port
 cnode.register('127.0.0.1', 5683, function (err, rsp) {
     console.log(rsp);      // { status: '2.05' }
 });
@@ -75,7 +76,7 @@ cnode.register('127.0.0.1', 5683, function (err, rsp) {
 Server-side example (please go to [coap-shepherd](https://github.com/PeterEB/coap-shepherd) document for details):
 
 ```js
-var cnode = cserver.find('foo_name');
+var cnode = cserver.find('my_first_node');
 
 cnode.read('/temperature/0/sensorValue', function (err, rsp) {
     console.log(rsp);      // { status: '2.05', data: 21 }
@@ -89,64 +90,75 @@ cnode.write('/temperature/1/sensorValue', function (err, rsp) {
 <a name="Resources"></a>
 ## 5. Resources Planning
 
-The great benefit of using this module is that **coap-node** will handle responses to the requests from the Server, as long as your Resources is planning well. So all you need to do is using API `initResrc(oid, iid, resrcs)` to initialize Resources as you need on the Device, where `oid` and `iid` are the Object id and Object Instance id. `resrcs` is an object containing all Resources under the Object Instance. In `resrcs` object, each key is `rid` and its corresponding value is the Resource value. 
+With **coap-node**, all you have to do is to plan your Resources well on your machine. **coap-node** will automatically tackle the response things for you with respect to requests from a Server. **coap-node** is trying to lower down your effort of designing client nodes in a machine network.  
 
-Resource value can be 
+Use `initResrc(oid, iid, resrcs)` method to help you with initializing your Resources. The parameters `oid` and `iid` are the Object id and Object Instance id, respectively. Parameter `resrcs` is an object containing all Resources in this Object Instance. Each key in `resrcs` object should be an `rid` and each value is its corresponding Resource value.  
 
-* [a definitely value.](#Resource_simple)
+A Resource value can be a  
+(1) [Primitive value.](#Resource_simple)  
+(2) [Object with `read()` method.](#Resource_readable) It's handy when you have to read a value with particular operations, e.g. reading from a gpio.  
+(3) [Object with `write()` method.](#Resource_writeable) It's handy when you have to write a value with particular operations, e.g. write a value to a pwm output pin.  
+(4) [Object with `read()` and `write` methods.](#Resource_both)
+(5) [Object with `exec()` method.](#Resource_executable) This helps you with designing remote procedure calls.  
 
-* [a object with `read` method.](#Resource_readable) Whenever the Server requests to read the Resource, the `read()` method will be called to read from the specified operation. 
-
-* [a object with `write` method.](#Resource_writeable) Whenever the Server requests to write the Resource, the `write()` method will be called to write to the specified operation. 
-
-* [a object with both of `read` and `write` methods.](#Resource_both)
-
-* [a object with `exec` method.](#Resource_executable) Whenever the Server requests to execute the Resource, the `exec()` method will be called. 
-
-The following description will tell you how to build them.
+Let me show you some examples:  
 
 <a name="Resource_simple"></a>
-### Initialize Resource as a definitely value
+### (1) Initialize a Resource as a primitive value
 
-The most common Resource is a simple value. It can be a number, a string or a boolean. The following example is a temperature Object with Resources 'sensorValue' and 'units':
+The Resource is a simple value which can be a number, a string, or a boolean.  
+
+The following example gives an **Object Instance** (iid = 0) of an **Object** (oid = 'temperature'), and this Instance has two Resources, 'sensorValue' and 'units', in it.
 
 ```js
 cnode.initResrc('temperature', 0, {
-    sensorValue: 21,
-    units: 'C'
+    sensorValue: 21,    // Resource value is a number 21
+    units: 'C'          // Resource value is a string 'C'
 });
 ```
 
-If you want to change the Resource value, you need to use API `writeResrc(oid, iid, rid, val)`. The following example show you how to write Resources 'sensorValue':
+**Note**:  
+An IPSO Object is like a **Class**, and an IPSO Object Instance is an entity of such a Class. For example, when you have many 'temperature' sensors, you have to use an `iid` on each Object Instance to distinguish one entity from the other.  
+
+<br />
+
+If you want to change the Resource value, use API `writeResrc(oid, iid, rid, val)` to update it and **coap-node** will check whether it should report this change to the Server or not. This example shows you how to write a value to the Resource 'sensorValue':  
 
 ```js
-var tempVal = gpio.read('gpio0');
+var tempVal = gpio.read('gpio0');   // synchronously read a value from gpio
 cnode.writeResrc('temperature', 0, 'sensorValue', tempVal);
+
+// if you like to keep your 'sensorValue' updated, you have to poll 'gpio0' regularly 
+// and write the lastest read value to the Resource.
 ```
 
 <a name="Resource_readable"></a>
-### Initialize Resource with read method
+### (2) Initialize a Resource with read method
 
-It's easy to use this plan. You have to know the signature of `read` method is `function (cb)`, where `cb(err, val)` is an err-back function that you should call and pass the read value through its second argument `val` when your read operation accomplishes. If any error occurs, you can pass the error through the first argument `err`. Here is an exmaple:
+If reading a value requires some particular operations, e.g. reading from a gpio, it would be better to initialize the Resource with this pattern. The good news is that each time a Server requests for the Resource, **coap-node** can always respond its latest value back by calling the read() method you gave, or you may have to poll the Resource as fast as possible to keep its value _really updated_.  
+
+The signature of a read method is `function (cb)`, where `cb(err, val)` is an err-back function that you should call and pass the read value through its second argument `val` when your reading operation accomplishes. If any error occurs, pass the error through the first argument `err` to tell **coap-node** there is something bad happening.  
+
+Let me show you an exmaple:
 
 ```js
 cnode.initResrc('temperature', 0, {
     sensorValue: {
         read: function (cb) {
             var tempVal = gpio.read('gpio0');
-            cb(null, tempVal);
+            cb(null, tempVal);  // pass the read value, tempVal, to the callback cb
         }
     },
     units: 'C'
 });
 ```
 
-If you define Resource with read method, the Resource will be inherently readable. If the Server request to read a Resource that is not readable, it will get special value of string '\_unreadable\_' along with a status code of '4.05'(Method Not Allowed).
+If your Resource is an object with a read method, it will be inherently readable. When a Server requests for a Resource that is not readable, **coap-node** will respond back a special value of string '\_unreadable\_' along with a status code of '4.05'(Method Not Allowed) to the Server.  
 
 <a name="Resource_writeable"></a>
-### Initialize Resource with write method
+### (3) Initialize Resource with write method
 
-This plan is similar to readable Resource. The signature of `write` method is `function (val, cb)`, where `val` is the value to wirte to this Resource and `cb(err, val)` is an err-back function that you should call and pass the written value through its second argument `val` when your read operation accomplishes. If any error occurs, you can pass the error through the first argument `err`. Here is an exmaple:
+The signature of a write method is `function (val, cb)`, where `val` is the value to wirte to this Resource and `cb(err, val)` is an err-back function that you should call and pass the written value through its second argument `val` when your writing operation accomplishes. If any error occurs, pass the error through the first argument `err`. Here is an exmaple:  
 
 ```js
 cnode.initResrc('lightCtrl', 0, {
@@ -159,12 +171,13 @@ cnode.initResrc('lightCtrl', 0, {
 });
 ```
 
-If you define Resource with write method, the Resource will be inherently writeable. If the Server request to write a Resource that is not writeable, it will get a status code of '4.05'(Method Not Allowed).
+If you initialize a Resource as an obejct with a write method, this Resource will be inherently writable. When a Server requests to write a value to an unwritable Resource, **coap-node** will respond back a special value of string '\_unwritable\_' along with a status code of '4.05'(Method Not Allowed) to the Server. [TODO] respond the string '\_unwritable\_' back, am I right? If not, take it off.  
+
 
 <a name="Resource_both"></a>
-### Initialize Resource with both of read and write method
+### (4) Initialize Resource with read and write methods
 
-If you want the Resource is both of readable and writable, you should give both of read and write methods to it:
+If a Resource is readable and writable, then there should be both of read() and write() methods in your object:  
 
 ```js
 cnode.initResrc('lightCtrl', 0, {
@@ -182,13 +195,17 @@ cnode.initResrc('lightCtrl', 0, {
 ```
 
 <a name="Resource_executable"></a>
-### Initialize Resource with exec method
+### (5) Initialize Resource with exec method
 
-Finally, an executable Resource. Executable Resource allows Server to remotely call a procedure on the Device. You can define some procedure calls of you need in executable Resource. In this plan, the signature of `write` method is `function (..., cb)`, the number of arguments depends on your own definition. The `cb(status, data)` is a callback function that you should call, where `status` is the respond code to the requests from the Server. If the procedure operates successfully, you should give `status` 'null' or '2.04'(Changed). If any error occurs during the procedure, you should give `status` '4.00'(Bad Request) or your own definition. Here is an exmaple:
+Finally, an executable Resource. Executable Resource allows a Server to remotely call a procedure on the Client Device. You can define some procedure calls to fit your needs with executable Resources, e.g. to ask your Device to blink a LED for 100 times and to show warning signs on a screen or something.  
+
+The signature of an exec method is `function (..., cb)`, the number of arguments depends on your own definition. The callback `cb(status, data)` is a function that you should call after its job is done. Parameter `status` is the status code you'd like to respond back to the Server. Give `status` with 'null' or '2.04' (Changed) if the operation succeeds. If any error occurs, give `status` with '4.00' (Bad Request) or a status code used in your application.  
+
+Here is an exmaple:
 
 ```js
-function blinkLed (led, time) {
-    //Let led blink
+function blinkLed(led, times) {
+    // blink an led
 }
 
 cnode.initResrc('led', 0, {
@@ -197,16 +214,16 @@ cnode.initResrc('led', 0, {
             if (typeof t !== 'number') {
                 cb('4.00', null);
             } else {
-                blinkLed('led0', t);    // invoke the procedure
+                blinkLed('led0', t);    // blink a led with t times
                 cb(null, null);         // or cb('2.04', null);
             }
-
         }
     },
 });
 ```
 
-If the Server request to read or write an executable Resource, it will get a status code of '4.05'(Method Not Allowed). In contrast, If the Server request to execute a Resource that is not executable, it also get a status code of '4.05'(Method Not Allowed).
+If a Server requests to read or write an executable Resource, **coap-node** will respond a status code of '4.05'(Method Not Allowed) to the Server. If a Server requests to execute a unexecutable Resource, **coap-node** will also respond back a status code of '4.05'(Method Not Allowed).  
+
 
 <a name="APIs"></a>
 ## 6. APIs and Events
@@ -308,7 +325,8 @@ Initialize the Resources on cnode.
 2. `iid` (_String_ | _Number_): id of the Object Instance that owns the Resources. It's common to use a number as `iid`, but using a string is also accepted.  
 3. `resrcs` (_Object_): an object with rid-value pairs to describe the Resources. Each Resource is something that could be read, written, or executed remotely by a Server.  
 
-Note: Please refer to [lwm2m-id](https://github.com/simenkid/lwm2m-id#5-table-of-identifiers) for all pre-defined IPSO/OMA-LWM2M ids. If the `oid` or `rid` is not a pre-defined id, **coap-node** will regard it as a private one.  
+**Note**: 
+Please refer to [lwm2m-id](https://github.com/simenkid/lwm2m-id#5-table-of-identifiers) for all pre-defined IPSO/OMA-LWM2M ids. If the `oid` or `rid` is not a pre-defined id, **coap-node** will regard it as a private one.  
 
 **Returns:**  
 
