@@ -13,6 +13,14 @@ coap-node
 <a name="Overiew"></a>
 ## 1. Overview
 
+<br />
+
+[---- WAITING FOR REVISING, Ignore this section ----]
+
+<br />
+
+<br />
+
 [**CoAP**](https://tools.ietf.org/html/rfc7252) is an application layer protocol based on RESTful intended to be used in resource constrained internet devices such as M2M or IoT that allows them to communicate interactively over the Internet. [**OMA Lightweight M2M**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) (LWM2M) is a resource constrained device management protocol relies on **CoAP**. 
 
 [**coap-shepherd**](https://github.com/PeterEB/coap-shepherd) is an implementation of **CoAP** device management Server with Node.js that follows part of **LWM2M** specification to achieve machine network management.
@@ -33,6 +41,16 @@ coap-node
 * Ready to provide CoAP services at machine node  
 * LWM2M interfaces for Client/Server interaction  
 * Smart-Object-style (IPSO) and easy to create a Resource on a Client Device  
+
+<br />
+
+<br />
+
+[---- END: WAITING FOR REVISING, Ignore this section ----]
+
+<br />
+
+<br />
 
 <a name="Installation"></a>
 ## 3. Installation
@@ -156,7 +174,7 @@ cnode.initResrc('temperature', 0, {
 If your Resource is an object with a read method, it will be inherently readable. When a Server requests for a Resource that is not readable, **coap-node** will respond back a special value of string '\_unreadable\_' along with a status code of '4.05'(Method Not Allowed) to the Server.  
 
 <a name="Resource_writeable"></a>
-### (3) Initialize Resource with write method
+### (3) Initialize a Resource with write method
 
 The signature of a write method is `function (val, cb)`, where `val` is the value to wirte to this Resource and `cb(err, val)` is an err-back function that you should call and pass the written value through its second argument `val` when your writing operation accomplishes. If any error occurs, pass the error through the first argument `err`. Here is an exmaple:  
 
@@ -175,7 +193,7 @@ If you initialize a Resource as an obejct with a write method, this Resource wil
 
 
 <a name="Resource_both"></a>
-### (4) Initialize Resource with read and write methods
+### (4) Initialize a Resource with read and write methods
 
 If a Resource is readable and writable, then there should be both of read() and write() methods in your object:  
 
@@ -195,7 +213,7 @@ cnode.initResrc('lightCtrl', 0, {
 ```
 
 <a name="Resource_executable"></a>
-### (5) Initialize Resource with exec method
+### (5) Initialize a Resource with exec method
 
 Finally, an executable Resource. Executable Resource allows a Server to remotely call a procedure on the Client Device. You can define some procedure calls to fit your needs with executable Resources, e.g. to ask your Device to blink a LED for 100 times and to show warning signs on a screen or something.  
 
@@ -240,6 +258,7 @@ If a Server requests to read or write an executable Resource, **coap-node** will
 *************************************************
 ## CoapNode Class
 Exposed by `require('coap-node')`.  
+  
 An instance of this class is denoted as **cnode** in this document. Configurations of connection are read from the `config.js` file in the root folder of the module.  
 
 <a name="API_CoapNode"></a>
@@ -248,12 +267,12 @@ Create a new instance of CoapNode class.
 
 **Arguments:**  
 
-1. `clientName` (_String_): name of the Client Device, it should be unique in the network.  
-2. `devAttrs` (_Object_): attributes of the Device. The following table shows the details of each property within devAttrs.  
+1. `clientName` (_String_): Name of the Client Device, it should be unique in the network.  
+2. `devAttrs` (_Object_): Attributes of the Device. The following table shows the details of each property within devAttrs.  
 
     |  Property  | Type   | Required | Description |
     |------------|--------|----------|-------------|
-    | `lifetime` | Number | optional | Registration will be removed by the server if a new registration or update is not received within `lifetime` seconds. Default is 86400 (seconds) |
+    | `lifetime` | Number | optional | Registration will be removed by the server if a new registration or update from cnode is not received within `lifetime` seconds. Default is 86400 (seconds) |
     | `ip`       | String | optional | Device ip address               |
     | `version`  | String | optional | Minimum supported LWM2M version |
 
@@ -276,7 +295,7 @@ Set device attributes of the cnode and send an update request to the Server.
 
 **Arguments:**  
 
-1. `attrs` (_Object_): device attributes.  
+1. `attrs` (_Object_): Device attributes.  
 
     |  Property  | Type   | Required |
     |------------|--------|----------|
@@ -284,7 +303,7 @@ Set device attributes of the cnode and send an update request to the Server.
     | ip         | String | optional |
     | version    | String | optional |
 
-2. `callback` (_Function_): `function (err, rsp) { }`. Get called after the updating procedure done. `rsp` is the response object with a status code to tell whether this operation is successful.  
+2. `callback` (_Function_): `function (err, rsp) { }`. Get called after the Server accomplishes the update. `rsp` is the response object with a status code to tell whether this operation is successful.  
 
     * `rsp.status` (_String_)  
 
@@ -304,7 +323,7 @@ Set device attributes of the cnode and send an update request to the Server.
 **Examples:** 
 
 ```js
-// [TBD] when will this event fire? when success (2.04)?
+// [TBD] when will this event fire? when success (2.04)? or '2.00' will do? Please give description about this.
 cnode.on('updated', function () {
     console.log('updated');
 });
@@ -317,16 +336,16 @@ cnode.setDevAttrs({ lifetime: 12000 }, function (err, rsp) {
 *************************************************
 <a name="API_initResrc"></a>
 ### initResrc(oid, iid, resrcs)
-Initialize the Resources on cnode.
+Initialize the Resources on cnode.  
 
 **Arguments:**  
 
-1. `oid` (_String_ | _Number_): id of the Object that owns the Resources.  
-2. `iid` (_String_ | _Number_): id of the Object Instance that owns the Resources. It's common to use a number as `iid`, but using a string is also accepted.  
-3. `resrcs` (_Object_): an object with rid-value pairs to describe the Resources. Each Resource is something that could be read, written, or executed remotely by a Server.  
+1. `oid` (_String_ | _Number_): Id of the Object that owns the Resources.  
+2. `iid` (_String_ | _Number_): Id of the Object Instance that owns the Resources. It's common to use a number as `iid`, but using a string is also accepted.  
+3. `resrcs` (_Object_): An object with **rid-value pairs** to describe the Resources. Each Resource is something that could be read, written, or executed remotely by a Server.  
 
 **Note**: 
-Please refer to [lwm2m-id](https://github.com/simenkid/lwm2m-id#5-table-of-identifiers) for all pre-defined IPSO/OMA-LWM2M ids. If the `oid` or `rid` is not a pre-defined id, **coap-node** will regard it as a private one.  
+Please refer to [lwm2m-id](https://github.com/simenkid/lwm2m-id#5-table-of-identifiers) for all pre-defined IPSO/OMA-LWM2M identifiers. If the `oid` or `rid` is not a pre-defined id, **coap-node** will regard it as a private one.  
 
 **Returns:**  
 
@@ -389,7 +408,7 @@ cnode.initResrc('led', 0, {
     blink: {
         exec: function (t, cb) {
             blinkLed('led0', t);    // bink led0 for t times
-            cb(null, null)          // [TBD] no status for cb()?
+            cb(null, null)          // [TBD] no status for cb()? null is default a success? Please describe this.
         }
     },
 });
@@ -397,16 +416,16 @@ cnode.initResrc('led', 0, {
 *************************************************
 <a name="API_readResrc"></a>
 ### readResrc(oid, iid, rid[, callback])
-Read value from the allocated Resource.  
+Read a value from the allocated Resource.  
 
 **Arguments:**  
 
 1. `oid` (_String_ | _Number_): Object id.  
 2. `iid` (_String_ | _Number_): Object Instance id.  
 3. `rid` (_String_ | _Number_): Resource id of the allocated Resource.  
-4. `callback` (_Function_): `function (err, val) { }`. `val` is the read result.  
+4. `callback` (_Function_): `function (err, val) { }`, where `val` is the read result.  
 
-    Note: If the Resource is not a simple value and there has no read method been initialized for it, the `val` passes to the callback will be a string `\_unreadable\_`. If the Resource is an executable resource, the `val` passes to the callback will be a string `\_exec\_`. If the Resource is not found, an error will be passed to fisrt argument of the callback.  
+    If the Resource is not a simple value and there has not a read method been initialized for it, the `val` passes to the callback will be a string `\_unreadable\_`. If the Resource is an executable resource, the `val` passes to the callback will be a string `\_exec\_`. If the Resource is not found, an error will be passed to fisrt argument of the callback.  
 
 **Returns:**  
 
@@ -438,9 +457,9 @@ Write a value to the allocated Resource.
 2. `iid` (_String_ | _Number_): Object Instance id.  
 3. `rid` (_String_ | _Number_): Resource id.  
 4. `value` (_Depends_): value to write to the allocated Resource.  
-5. `callback` (_Function_): `function (err, val) { }`. `val` is the value written.  
+5. `callback` (_Function_): `function (err, val) { }`, where `val` is the written value.  
 
-    Note: If the Resource is not a simple value and there has no write method been initialized for it, the `val` passes to the callback will be a string `\_unwriteable\_`. If the Resource is an executable Resource, the `val` passes to the callback will be a string `\_exec\_`. If the allocated Resource is not found, an error will be passed to fisrt argument of the callback.  
+    If the Resource is not a simple value and there has not a write method been initialized for it, the `val` passes to the callback will be a string `\_unwritable\_`. If the Resource is an executable Resource, the `val` passes to the callback will be a string `\_exec\_`. If the allocated Resource is not found, an error will be passed to fisrt argument of the callback.  
 
 **Returns:**  
 
@@ -470,7 +489,7 @@ Send a register request to the Server.
 
 1. `ip` (_String_): Server ip address.  
 2. `port` (_String_ | _Number_): Server port.  
-3. `callback` (_Function_): `function (err, rsp) { }`. `rsp` is the response object with a status code to tell whether this request is successful.  
+3. `callback` (_Function_): `function (err, rsp) { }`, where `rsp` is the response object with a status code to tell whether this request is successful.  
 
     * `rsp.status` (_String_)  
 
@@ -494,8 +513,8 @@ cnode.on('registered', function () {
     console.log('registered');
 });
 
-cnode.register('127.0.0.1', 5683, function (err, msg) {
-    console.log(msg);   // { status: '2.01' }
+cnode.register('127.0.0.1', 5683, function (err, rsp) {
+    console.log(rsp);   // { status: '2.01' }
 });
 ```
 
@@ -506,16 +525,16 @@ Send a deregister request to the Server.
 
 **Arguments:**  
 
-1. `callback` (_Function_): `function (err, rsp) { }` Get called after the deregistering procedure done. `msg` is response message object with status code:
+1. `callback` (_Function_): `function (err, rsp) { }`, where `rsp` is the response object with a status code to tell whether this request is successful.  
 
-    * `msg.status` (_String_): Status code of the response. The descriptions of status code are given in the following table.
+    * `rsp.status` (_String_)
 
-        | msg.status | Status Code           | Description |
-        |------------|-----------------------|-------------|
-        | 2.02       | Deleted               | Set device attributes operation is completed successfully. |
-        | 4.04       | Not Found             | The device was not registered on the Server.               |
-        | 4.08       | Timeout               | No response from the Server in 60 secs.                    |
-        | 5.00       | Internal Server Error | The Server has some error.                                 |
+        | rsp.status | Status                | Description                                                |
+        |------------|-----------------------|------------------------------------------------------------|
+        | '2.02'     | Deleted               | Set device attributes operation is completed successfully. |
+        | '4.04'     | Not Found             | The device was not registered to the Server.               |
+        | '4.08'     | Timeout               | No response from the Server in 60 secs.                    |
+        | '5.00'     | Internal Server Error | Something wrong with the Server.                           |
 
 **Returns:**  
 
@@ -524,37 +543,38 @@ Send a deregister request to the Server.
 **Examples:** 
 
 ```js
-coapNode.on('deregistered', function () {
+cnode.on('deregistered', function () {
     console.log('deregistered');
 });
 
-coapNode.deregister(function (err, msg) {
-    console.log(msg);   // { status: '2.02' }
+cnode.deregister(function (err, rsp) {
+    console.log(rsp);   // { status: '2.02' }
 });
 ```
+
 *************************************************
 <a name="EVT_registered"></a>
 ### Event: 'registered'
 `function () { }`
-Fired when the Device registered.
+Fired when the Device successfully registers to the Server.  
 
 *************************************************
 <a name="EVT_updated"></a>
 ### Event: 'updated'
 `function () { }`
-Fired when the Device attributes updated.
+Fired when the Device attributes updated.  
 
 *************************************************
 <a name="EVT_deregistered"></a>
 ### Event: 'deregistered'
 `function () { }`
-Fired when the Device deregistered.
+Fired when the Device successfully deregisters from the Server.  
 
 *************************************************
 <a name="EVT_announce"></a>
 ### Event: 'announce'
 `function (msg) { }`
-Fired when there is an announce from Server.
+Fired when there is an announce from the Server.  
 
 * msg (_String_): the announce messages.
 
@@ -562,6 +582,6 @@ Fired when there is an announce from Server.
 <a name="EVT_error"></a>
 ### Event: 'error'
 `function (err) { }`
-Fired when there is an error occurred.
+Fired when there is an error occurred.  
 
 *************************************************
