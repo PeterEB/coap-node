@@ -13,6 +13,14 @@ coap-node
 <a name="Overiew"></a>
 ## 1. Overview
 
+<br />
+
+[---- WAITING FOR REVISING, Ignore this section ----]
+
+<br />
+
+<br />
+
 [**CoAP**](https://tools.ietf.org/html/rfc7252) is an application layer protocol based on RESTful intended to be used in resource constrained internet devices such as M2M or IoT that allows them to communicate interactively over the Internet. [**OMA Lightweight M2M**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) (LWM2M) is a resource constrained device management protocol relies on **CoAP**. 
 
 [**coap-shepherd**](https://github.com/PeterEB/coap-shepherd) is an implementation of **CoAP** device management Server with Node.js that follows part of **LWM2M** specification to achieve machine network management.
@@ -28,11 +36,21 @@ coap-node
 <a name="Features"></a>
 ## 2. Features
 
-* CoAP protocol
-* Based on library [node-coap](https://github.com/mcollina/node-coap)
-* CoAP Server Device
-* LWM2M interfaces for Client/Server interaction
-* Smart-Object-style (IPSO)
+* CoAP protocol  
+* Based on [node-coap](https://github.com/mcollina/node-coap) library  
+* Ready to provide CoAP services at machine node  
+* LWM2M interfaces for Client/Server interaction  
+* Smart-Object-style (IPSO) and easy to create a Resource on a Client Device  
+
+<br />
+
+<br />
+
+[---- END: WAITING FOR REVISING, Ignore this section ----]
+
+<br />
+
+<br />
 
 <a name="Installation"></a>
 ## 3. Installation
@@ -42,14 +60,13 @@ coap-node
 <a name="Usage"></a>
 ## 4. Usage
 
-Client-side exmaple (the following example is how to use `coap-node`):
+Client-side exmaple (the following example shows how you use `coap-node` on a machine node):
 
 ```js
 var CoapNode = require('coap-node');
+var cnode = new CoapNode('my_first_node');
 
-var cnode = new CoapNode('foo_name');
-
-// initialize your Resource
+// initialize your Resources
 // oid = 'temperature', iid = 0
 cnode.initResrc('temperature', 0, {
     sensorValue: 21,
@@ -64,91 +81,102 @@ cnode.initResrc('temperature', 1, {
 
 cnode.on('registered', function () {
     // If the registration procedure completes successfully, 'registered' will be fired
-    // do your application here
+
+    // start your application
 });
 
-// register to the Server
-//             Server ip, Server port
-cnode.register('127.0.0.1', 5683, function (err, msg) {
-    console.log(msg);      // { status: '2.05' }
+// register to a Server with its ip and port
+cnode.register('127.0.0.1', 5683, function (err, rsp) {
+    console.log(rsp);      // { status: '2.05' }
 });
 ```
 
 Server-side example (please go to [coap-shepherd](https://github.com/PeterEB/coap-shepherd) document for details):
 
 ```js
-var cnode = shepherd.find('foo_name');
+var cnode = cserver.find('my_first_node');
 
-cnode.read('/temperature/0/sensorValue', function (err, msg) {
-    console.log(msg);      // { status: '2.05', data: 21 }
+cnode.read('/temperature/0/sensorValue', function (err, rsp) {
+    console.log(rsp);      // { status: '2.05', data: 21 }
 });
 
-cnode.write('/temperature/1/sensorValue', function (err, msg) {
-    console.log(msg);      // { status: '2.04' }
+cnode.write('/temperature/1/sensorValue', function (err, rsp) {
+    console.log(rsp);      // { status: '2.04' }
 });
 ```
 
 <a name="Resources"></a>
 ## 5. Resources Planning
 
-The great benefit of using this module is that **coap-node** will handle responds to the requests from the Server, as long as your Resources is planning well. So all you need to do is using API `initResrc(oid, iid, resrcs)` to initialize Resources as you need on the Device, where `oid` and `iid` are the Object id and Object Instance id. `resrcs` is an object containing all Resources under the Object Instance. In `resrcs` object, each key is `rid` and its corresponding value is the Resource value. 
+With **coap-node**, all you have to do is to plan your Resources well on your machine. **coap-node** will automatically tackle the response things for you with respect to requests from a Server. **coap-node** is trying to lower down your effort of designing client nodes in a machine network.  
 
-Resource value can be 
+Use `initResrc(oid, iid, resrcs)` method to help you with initializing your Resources. The parameters `oid` and `iid` are the Object id and Object Instance id, respectively. Parameter `resrcs` is an object containing all Resources in this Object Instance. Each key in `resrcs` object should be an `rid` and each value is its corresponding Resource value.  
 
-* [a definitely value.](#Resource_simple)
+A Resource value can be a  
+(1) [Primitive value.](#Resource_simple)  
+(2) [Object with `read()` method.](#Resource_readable) It's handy when you have to read a value with particular operations, e.g. reading from a gpio.  
+(3) [Object with `write()` method.](#Resource_writeable) It's handy when you have to write a value with particular operations, e.g. write a value to a pwm output pin.  
+(4) [Object with `read()` and `write` methods.](#Resource_both)
+(5) [Object with `exec()` method.](#Resource_executable) This helps you with designing remote procedure calls.  
 
-* [a object with `read` method.](#Resource_readable) Whenever the Server requests to read the Resource, the `read()` method will be called to read from the specified operation. 
-
-* [a object with `write` method.](#Resource_writeable) Whenever the Server requests to write the Resource, the `write()` method will be called to write to the specified operation. 
-
-* [a object with both of `read` and `write` methods.](#Resource_both)
-
-* [a object with `exec` method.](#Resource_executable) Whenever the Server requests to execute the Resource, the `exec()` method will be called. 
-
-The following description will tell you how to build them.
+Let me show you some examples:  
 
 <a name="Resource_simple"></a>
-### Initialize Resource as a definitely value
+### (1) Initialize a Resource as a primitive value
 
-The most common Resource is a simple value. It can be a number, a string or a boolean. The following example is a temperature Object with Resources 'sensorValue' and 'units':
+The Resource is a simple value which can be a number, a string, or a boolean.  
+
+The following example gives an **Object Instance** (iid = 0) of an **Object** (oid = 'temperature'), and this Instance has two Resources, 'sensorValue' and 'units', in it.
 
 ```js
 cnode.initResrc('temperature', 0, {
-    sensorValue: 21,
-    units: 'C'
+    sensorValue: 21,    // Resource value is a number 21
+    units: 'C'          // Resource value is a string 'C'
 });
 ```
 
-If you want to change the Resource value, you need to use API `writeResrc(oid, iid, rid, val)`. The following example show you how to write Resources 'sensorValue':
+**Note**:  
+An IPSO Object is like a **Class**, and an IPSO Object Instance is an entity of such a Class. For example, when you have many 'temperature' sensors, you have to use an `iid` on each Object Instance to distinguish one entity from the other.  
+
+<br />
+
+If you want to change the Resource value, use API `writeResrc(oid, iid, rid, val)` to update it and **coap-node** will check whether it should report this change to the Server or not. This example shows you how to write a value to the Resource 'sensorValue':  
 
 ```js
-var tempVal = gpio.read('gpio0');
+var tempVal = gpio.read('gpio0');   // synchronously read a value from gpio
 cnode.writeResrc('temperature', 0, 'sensorValue', tempVal);
+
+// if you like to keep your 'sensorValue' updated, you have to poll 'gpio0' regularly 
+// and write the lastest read value to the Resource.
 ```
 
 <a name="Resource_readable"></a>
-### Initialize Resource with read method
+### (2) Initialize a Resource with read method
 
-It's easy to use this plan. You have to know the signature of `read` method is `function (cb)`, where `cb(err, val)` is an err-back function that you should call and pass the read value through its second argument `val` when your read operation accomplishes. If any error occurs, you can pass the error through the first argument `err`. Here is an exmaple:
+If reading a value requires some particular operations, e.g. reading from a gpio, it would be better to initialize the Resource with this pattern. The good news is that each time a Server requests for the Resource, **coap-node** can always respond its latest value back by calling the read() method you gave, or you may have to poll the Resource as fast as possible to keep its value _really updated_.  
+
+The signature of a read method is `function (cb)`, where `cb(err, val)` is an err-back function that you should call and pass the read value through its second argument `val` when your reading operation accomplishes. If any error occurs, pass the error through the first argument `err` to tell **coap-node** there is something bad happening.  
+
+Let me show you an exmaple:
 
 ```js
 cnode.initResrc('temperature', 0, {
     sensorValue: {
         read: function (cb) {
             var tempVal = gpio.read('gpio0');
-            cb(null, tempVal);
+            cb(null, tempVal);  // pass the read value, tempVal, to the callback cb
         }
     },
     units: 'C'
 });
 ```
 
-If you define Resource with read method, the Resource will be inherently readable. If the Server request to read a Resource that is not readable, it will get special value of string '\_unreadable\_' along with a status code of '4.05'(Method Not Allowed).
+If your Resource is an object with a read method, it will be inherently readable. When a Server requests for a Resource that is not readable, **coap-node** will respond back a special value of string '\_unreadable\_' along with a status code of '4.05'(Method Not Allowed) to the Server.  
 
 <a name="Resource_writeable"></a>
-### Initialize Resource with write method
+### (3) Initialize a Resource with write method
 
-This plan is similar to readable Resource. The signature of `write` method is `function (val, cb)`, where `val` is the value to wirte to this Resource and `cb(err, val)` is an err-back function that you should call and pass the written value through its second argument `val` when your read operation accomplishes. If any error occurs, you can pass the error through the first argument `err`. Here is an exmaple:
+The signature of a write method is `function (val, cb)`, where `val` is the value to wirte to this Resource and `cb(err, val)` is an err-back function that you should call and pass the written value through its second argument `val` when your writing operation accomplishes. If any error occurs, pass the error through the first argument `err`. Here is an exmaple:  
 
 ```js
 cnode.initResrc('lightCtrl', 0, {
@@ -161,12 +189,13 @@ cnode.initResrc('lightCtrl', 0, {
 });
 ```
 
-If you define Resource with write method, the Resource will be inherently writeable. If the Server request to write a Resource that is not writeable, it will get a status code of '4.05'(Method Not Allowed).
+If you initialize a Resource as an obejct with a write method, this Resource will be inherently writable. When a Server requests to write a value to an unwritable Resource, **coap-node** will respond back a special value of string '\_unwritable\_' along with a status code of '4.05'(Method Not Allowed) to the Server. [TODO] respond the string '\_unwritable\_' back, am I right? If not, take it off.  
+
 
 <a name="Resource_both"></a>
-### Initialize Resource with both of read and write method
+### (4) Initialize a Resource with read and write methods
 
-If you want the Resource is both of readable and writable, you should give both of read and write methods to it:
+If a Resource is readable and writable, then there should be both of read() and write() methods in your object:  
 
 ```js
 cnode.initResrc('lightCtrl', 0, {
@@ -184,13 +213,17 @@ cnode.initResrc('lightCtrl', 0, {
 ```
 
 <a name="Resource_executable"></a>
-### Initialize Resource with exec method
+### (5) Initialize a Resource with exec method
 
-Finally, an executable Resource. Executable Resource allows Server to remotely call a procedure on the Device. You can define some procedure calls of you need in executable Resource. In this plan, the signature of `write` method is `function (..., cb)`, the number of arguments depends on your own definition. The `cb(status, data)` is a callback function that you should call, where `status` is the respond code to the requests from the Server. If the procedure operates successfully, you should give `status` 'null' or '2.04'(Changed). If any error occurs during the procedure, you should give `status` '4.00'(Bad Request) or your own definition. Here is an exmaple:
+Finally, an executable Resource. Executable Resource allows a Server to remotely call a procedure on the Client Device. You can define some procedure calls to fit your needs with executable Resources, e.g. to ask your Device to blink a LED for 100 times and to show warning signs on a screen or something.  
+
+The signature of an exec method is `function (..., cb)`, the number of arguments depends on your own definition. The callback `cb(status, data)` is a function that you should call after its job is done. Parameter `status` is the status code you'd like to respond back to the Server. Give `status` with 'null' or '2.04' (Changed) if the operation succeeds. If any error occurs, give `status` with '4.00' (Bad Request) or a status code used in your application.  
+
+Here is an exmaple:
 
 ```js
-function blinkLed (led, time) {
-    //Let led blink
+function blinkLed(led, times) {
+    // blink an led
 }
 
 cnode.initResrc('led', 0, {
@@ -199,16 +232,16 @@ cnode.initResrc('led', 0, {
             if (typeof t !== 'number') {
                 cb('4.00', null);
             } else {
-                blinkLed('led0', t);    // invoke the procedure
+                blinkLed('led0', t);    // blink a led with t times
                 cb(null, null);         // or cb('2.04', null);
             }
-
         }
     },
 });
 ```
 
-If the Server request to read or write an executable Resource, it will get a status code of '4.05'(Method Not Allowed). In contrast, If the Server request to execute a Resource that is not executable, it also get a status code of '4.05'(Method Not Allowed).
+If a Server requests to read or write an executable Resource, **coap-node** will respond a status code of '4.05'(Method Not Allowed) to the Server. If a Server requests to execute a unexecutable Resource, **coap-node** will also respond back a status code of '4.05'(Method Not Allowed).  
+
 
 <a name="APIs"></a>
 ## 6. APIs and Events
@@ -224,7 +257,9 @@ If the Server request to read or write an executable Resource, it will get a sta
 
 *************************************************
 ## CoapNode Class
-Exposed by require('coap-node'). All the client configuration is read from the `config.js` file in the root of the project. Such an instance is denoted as **cnode** in this document.
+Exposed by `require('coap-node')`.  
+  
+An instance of this class is denoted as **cnode** in this document. Configurations of connection are read from the `config.js` file in the root folder of the module.  
 
 <a name="API_CoapNode"></a>
 ### new CoapNode(clientName[, devAttrs])
@@ -232,15 +267,14 @@ Create a new instance of CoapNode class.
 
 **Arguments:**  
 
-1. `clientName` (_String_): the name of Client Device, it should be unique in the network. 
-
-2. `devAttrs` (_Object_): describe information about the Device. The following table shows the details of each property within devAttrs.
+1. `clientName` (_String_): Name of the Client Device, it should be unique in the network.  
+2. `devAttrs` (_Object_): Attributes of the Device. The following table shows the details of each property within devAttrs.  
 
     |  Property  | Type   | Required | Description |
     |------------|--------|----------|-------------|
-    | `lifetime` | Number | No       | the registration should be removed by the Server if a new registration or update is not received within this lifetime. default is 86400. Unit: seconds |
-    | `ip`       | String | No       | device ip address               |
-    | `version`  | String | No       | minimum supported LWM2M version |
+    | `lifetime` | Number | optional | Registration will be removed by the server if a new registration or update from cnode is not received within `lifetime` seconds. Default is 86400 (seconds) |
+    | `ip`       | String | optional | Device ip address               |
+    | `version`  | String | optional | Minimum supported LWM2M version |
 
 **Returns:**  
 
@@ -253,20 +287,34 @@ var CoapNode = require('./lib/coap-node.js');
 
 var cnode = new CoapNode('foo_name');
 ```
+
 *************************************************
-<a name="API_initResrc"></a>
-### initResrc(oid, iid, resrcs)
-Initialize the Resources on cnode.
+<a name="API_setDevAttrs"></a>
+### setDevAttrs(attrs[, callback])
+Set device attributes of the cnode and send an update request to the Server.
 
 **Arguments:**  
 
-1. `oid` (_String_ | _Number_): id of the Object that owns the Resources. 
+1. `attrs` (_Object_): Device attributes.  
 
-2. `iid` (_String_ | _Number_): id of the Object Instance that owns the Resources. It's common to use numbers to represent `iid`, but if you want to use a string to represent `iid` is okay.
+    |  Property  | Type   | Required |
+    |------------|--------|----------|
+    | lifetime   | Number | optional | 
+    | ip         | String | optional |
+    | version    | String | optional |
 
-3. `resrcs` (_Object_): a rid-value pairs Object to describe the Resources. Resource is an atomic piece of information that can be read, written or executed. 
+2. `callback` (_Function_): `function (err, rsp) { }`. Get called after the Server accomplishes the update. `rsp` is the response object with a status code to tell whether this operation is successful.  
 
-Note: You can refer to [lwm2m-id](https://github.com/simenkid/lwm2m-id#5-table-of-identifiers) for all pre-defined IPSO/OMA-LWM2M ids. If `oid` or `rid` is not a pre-defined id, **coap-node** will regard it as a private id.
+    * `rsp.status` (_String_)  
+
+        | rsp.status | Status                | Description                                                |
+        |------------|-----------------------|------------------------------------------------------------|
+        | '2.00'     | Ok                    | No device attribute update needed.                         |
+        | '2.04'     | Changed               | Set device attributes operation is completed successfully. |
+        | '4.00'     | Bad Requset           | There is an unrecognized attribute in the update request.  |
+        | '4.04'     | Not Found             | The device was not registered on the Server.               |
+        | '4.08'     | Timeout               | No response from the Server in 60 secs.                    |
+        | '5.00'     | Internal Server Error | Something wrong with the Server.                           |
 
 **Returns:**  
 
@@ -274,16 +322,47 @@ Note: You can refer to [lwm2m-id](https://github.com/simenkid/lwm2m-id#5-table-o
 
 **Examples:** 
 
-* Resource is a simple value (these initialize the same Resources with different formats id):
+```js
+// [TBD] when will this event fire? when success (2.04)? or '2.00' will do? Please give description about this.
+cnode.on('updated', function () {
+    console.log('updated');
+});
+
+cnode.setDevAttrs({ lifetime: 12000 }, function (err, rsp) {
+    console.log(rsp);   // { status: '2.04' }
+});
+```
+
+*************************************************
+<a name="API_initResrc"></a>
+### initResrc(oid, iid, resrcs)
+Initialize the Resources on cnode.  
+
+**Arguments:**  
+
+1. `oid` (_String_ | _Number_): Id of the Object that owns the Resources.  
+2. `iid` (_String_ | _Number_): Id of the Object Instance that owns the Resources. It's common to use a number as `iid`, but using a string is also accepted.  
+3. `resrcs` (_Object_): An object with **rid-value pairs** to describe the Resources. Each Resource is something that could be read, written, or executed remotely by a Server.  
+
+**Note**: 
+Please refer to [lwm2m-id](https://github.com/simenkid/lwm2m-id#5-table-of-identifiers) for all pre-defined IPSO/OMA-LWM2M identifiers. If the `oid` or `rid` is not a pre-defined id, **coap-node** will regard it as a private one.  
+
+**Returns:**  
+
+* (none)
+
+**Examples:** 
+
+* Resource is a simple value:
 
 ```js
-// oid and rids in string
+// use oid and rids in string
 cnode.initResrc('temperature', 1, {
     sensorValue: 70,
     units: 'F'
 });
 
-// oid and rids in number
+// use oid and rids in number
 cnode.initResrc(3303, 1, {
     5700: 70,
     5701: 'F'
@@ -296,7 +375,7 @@ cnode.initResrc('3303', 1, {
 });
 ```
 
-* Resource value read from particular operations:
+* Resource value is read from particular operations:
 
 ```js
 cnode.initResrc('dIn', 0, {
@@ -309,7 +388,7 @@ cnode.initResrc('dIn', 0, {
 });
 ```
 
-* Resource value would be written through particular operations:
+* Resource value should be written through particular operations:
 
 ```js
 cnode.initResrc('dOut', 0, {
@@ -322,14 +401,14 @@ cnode.initResrc('dOut', 0, {
 });
 ```
 
-* Resource is a executable procedure that can be remotely called:
+* Resource is an executable procedure that can be called remotely:
 
 ```js
 cnode.initResrc('led', 0, {
     blink: {
         exec: function (t, cb) {
             blinkLed('led0', t);    // bink led0 for t times
-            cb(null, null)
+            cb(null, null)          // [TBD] no status for cb()? null is default a success? Please describe this.
         }
     },
 });
@@ -337,19 +416,16 @@ cnode.initResrc('led', 0, {
 *************************************************
 <a name="API_readResrc"></a>
 ### readResrc(oid, iid, rid[, callback])
-Read value from the allocated Resource.
+Read a value from the allocated Resource.  
 
 **Arguments:**  
 
-1. `oid` (_String_ | _Number_): the Object id of the allocated Resource.
+1. `oid` (_String_ | _Number_): Object id.  
+2. `iid` (_String_ | _Number_): Object Instance id.  
+3. `rid` (_String_ | _Number_): Resource id of the allocated Resource.  
+4. `callback` (_Function_): `function (err, val) { }`, where `val` is the read result.  
 
-2. `iid` (_String_ | _Number_): the Object Instance id of the allocated Resource.
-
-3. `rid` (_String_ | _Number_): the Resource id of the allocated Resource.
-
-4. `callback` (_Function_): `function (err, val) { }` Get called after the reading procedure done. `val` is allocated Resource value. 
-
-    Note: If the Resource is not a simple value and there has no read method, the `val` passes to the callback will be a string `\_unreadable\_`; If the Resource is an executable Resource, the `val` passes to the callback will be a string `\_exec\_`; If the allocated Resource is not found, an error will be passed to fisrt argument of the callback.
+    If the Resource is not a simple value and there has not a read method been initialized for it, the `val` passes to the callback will be a string `\_unreadable\_`. If the Resource is an executable resource, the `val` passes to the callback will be a string `\_exec\_`. If the Resource is not found, an error will be passed to fisrt argument of the callback.  
 
 **Returns:**  
 
@@ -373,21 +449,17 @@ cnode.readResrc('led', 0, 'blink', function (err, val) {
 *************************************************
 <a name="API_writeResrc"></a>
 ### writeResrc(oid, iid, rid, value[, callback])
-Write the value to the allocated Resource.
+Write a value to the allocated Resource.  
 
 **Arguments:**  
 
-1. `oid` (_String_ | _Number_): Object id of the allocated Resource.
+1. `oid` (_String_ | _Number_): Object id.  
+2. `iid` (_String_ | _Number_): Object Instance id.  
+3. `rid` (_String_ | _Number_): Resource id.  
+4. `value` (_Depends_): value to write to the allocated Resource.  
+5. `callback` (_Function_): `function (err, val) { }`, where `val` is the written value.  
 
-2. `iid` (_String_ | _Number_): Object Instance id of the allocated Resource.
-
-3. `rid` (_String_ | _Number_): Resource id of the allocated Resource.
-
-4. `value` (_Depends_): the value to write to the allocated Resource.
-
-5. `callback` (_Function_): `function (err, val) { }` Get called after the writeing procedure done. `val` is written value. 
-
-    Note: If the Resource is not a simple value and there has no write method, the `val` passes to the callback will be a string `\_unwriteable\_`; If the Resource is an executable Resource, the `val` passes to the callback will be a string `\_exec\_`; If the allocated Resource is not found, an error will be passed to fisrt argument of the callback.
+    If the Resource is not a simple value and there has not a write method been initialized for it, the `val` passes to the callback will be a string `\_unwritable\_`. If the Resource is an executable Resource, the `val` passes to the callback will be a string `\_exec\_`. If the allocated Resource is not found, an error will be passed to fisrt argument of the callback.  
 
 **Returns:**  
 
@@ -411,26 +483,24 @@ cnode.writeResrc('led', 0, 'blink', 19, function (err, val) {
 *************************************************
 <a name="API_register"></a>
 ### register(ip, port[, callback])
-Send register request to the Server.
+Send a register request to the Server.  
 
 **Arguments:**  
 
-1. `ip` (_String_): ip address of the Server.
+1. `ip` (_String_): Server ip address.  
+2. `port` (_String_ | _Number_): Server port.  
+3. `callback` (_Function_): `function (err, rsp) { }`, where `rsp` is the response object with a status code to tell whether this request is successful.  
 
-2. `port` (_String_ | _Number_): port of the Server listening.
+    * `rsp.status` (_String_)  
 
-3. `callback` (_Function_): `function (err, msg) { }` Get called after the registering procedure done. `msg` is response message object with status code:
-
-    * `msg.status` (_String_): Status code of the response. The descriptions of status code are given in the following table.
-
-        | msg.status | Status Code           | Description |
-        |------------|-----------------------|-------------|
-        | 2.01       | Created               | Register operation is completed successfully.                         |
-        | 2.04       | Changed               | re-register and update device attributes is completed successfully.   |
-        | 4.00       | Bad Requset           | There is not ClientName or Objlist attribute in the register request. |
-        | 4.05       | Not Allowed           | The Server is not allowed for register operation.                     |
-        | 4.08       | Timeout               | No response from the Server in 60 secs.                               |
-        | 5.00       | Internal Server Error | The Server has some error.                                            |
+        | rsp.status | Status                | Description                                                               |
+        |------------|-----------------------|---------------------------------------------------------------------------|
+        | '2.01'     | Created               | Register operation is completed successfully.                             |
+        | '2.04'     | Changed               | Re-registration and updating device attributes is completed successfully. |
+        | '4.00'     | Bad Requset           | Request packet has no clientName or objList attribute in it.              |
+        | '4.05'     | Not Allowed           | The Server is not allowed for registration.                               |
+        | '4.08'     | Timeout               | No response from the Server in 60 secs.                                   |
+        | '5.00'     | Internal Server Error | Something wrong with the Server.                                          |
 
 **Returns:**  
 
@@ -443,70 +513,28 @@ cnode.on('registered', function () {
     console.log('registered');
 });
 
-cnode.register('127.0.0.1', 5683, function (err, msg) {
-    console.log(msg);   // { status: '2.01' }
+cnode.register('127.0.0.1', 5683, function (err, rsp) {
+    console.log(rsp);   // { status: '2.01' }
 });
 ```
-*************************************************
-<a name="API_setDevAttrs"></a>
-### setDevAttrs(attrs[, callback])
-Set the device attributes of cnode and send update request to the Server.
 
-**Arguments:**  
-
-1. `attrs` (_Object_): device attributes.
-
-    |  Property  | Type   | Required |
-    |------------|--------|----------|
-    | `lifetime` | Number | No       | 
-    | `ip`       | String | No       |
-    | `version`  | String | No       |
-
-2. `callback` (_Function_): `function (err, msg) { }` Get called after the updating procedure done. `msg` is response message object with status code:
-
-    * `msg.status` (_String_): Status code of the response. The descriptions of status code are given in the following table.
-
-        | msg.status | Status Code           | Description |
-        |------------|-----------------------|-------------|
-        | 2.00       | Ok                    | No device attributes need to update.                       |
-        | 2.04       | Changed               | Set device attributes operation is completed successfully. |
-        | 4.00       | Bad Requset           | There is an unrecognized attribute in the update request.  |
-        | 4.04       | Not Found             | The device was not registered on the Server.               |
-        | 4.08       | Timeout               | No response from the Server in 60 secs.                    |
-        | 5.00       | Internal Server Error | The Server has some error.                                 |
-
-**Returns:**  
-
-* (none)
-
-**Examples:** 
-
-```js
-coapNode.on('updated', function () {
-    console.log('updated');
-});
-
-coapNode.setDevAttrs({ lifetime: 12000 }, function (err, msg) {
-    console.log(msg);   // { status: '2.04' }
-});
-```
 *************************************************
 <a name="API_deregister"></a>
 ### deregister([callback])
-Send deregister request to the Server.
+Send a deregister request to the Server.  
 
 **Arguments:**  
 
-1. `callback` (_Function_): `function (err, msg) { }` Get called after the deregistering procedure done. `msg` is response message object with status code:
+1. `callback` (_Function_): `function (err, rsp) { }`, where `rsp` is the response object with a status code to tell whether this request is successful.  
 
-    * `msg.status` (_String_): Status code of the response. The descriptions of status code are given in the following table.
+    * `rsp.status` (_String_)
 
-        | msg.status | Status Code           | Description |
-        |------------|-----------------------|-------------|
-        | 2.02       | Deleted               | Set device attributes operation is completed successfully. |
-        | 4.04       | Not Found             | The device was not registered on the Server.               |
-        | 4.08       | Timeout               | No response from the Server in 60 secs.                    |
-        | 5.00       | Internal Server Error | The Server has some error.                                 |
+        | rsp.status | Status                | Description                                                |
+        |------------|-----------------------|------------------------------------------------------------|
+        | '2.02'     | Deleted               | Set device attributes operation is completed successfully. |
+        | '4.04'     | Not Found             | The device was not registered to the Server.               |
+        | '4.08'     | Timeout               | No response from the Server in 60 secs.                    |
+        | '5.00'     | Internal Server Error | Something wrong with the Server.                           |
 
 **Returns:**  
 
@@ -515,37 +543,38 @@ Send deregister request to the Server.
 **Examples:** 
 
 ```js
-coapNode.on('deregistered', function () {
+cnode.on('deregistered', function () {
     console.log('deregistered');
 });
 
-coapNode.deregister(function (err, msg) {
-    console.log(msg);   // { status: '2.02' }
+cnode.deregister(function (err, rsp) {
+    console.log(rsp);   // { status: '2.02' }
 });
 ```
+
 *************************************************
 <a name="EVT_registered"></a>
 ### Event: 'registered'
 `function () { }`
-Fired when the Device registered.
+Fired when the Device successfully registers to the Server.  
 
 *************************************************
 <a name="EVT_updated"></a>
 ### Event: 'updated'
 `function () { }`
-Fired when the Device attributes updated.
+Fired when the Device attributes updated.  
 
 *************************************************
 <a name="EVT_deregistered"></a>
 ### Event: 'deregistered'
 `function () { }`
-Fired when the Device deregistered.
+Fired when the Device successfully deregisters from the Server.  
 
 *************************************************
 <a name="EVT_announce"></a>
 ### Event: 'announce'
 `function (msg) { }`
-Fired when there is an announce from Server.
+Fired when there is an announce from the Server.  
 
 * msg (_String_): the announce messages.
 
@@ -553,6 +582,6 @@ Fired when there is an announce from Server.
 <a name="EVT_error"></a>
 ### Event: 'error'
 `function (err) { }`
-Fired when there is an error occurred.
+Fired when there is an error occurred.  
 
 *************************************************
