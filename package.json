@@ -1,6 +1,6 @@
 {
   "name": "coap-node",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "description": "An ip-based smart thing that plays as a client of coap-shepherd server.",
   "main": "index.js",
   "dependencies": {
@@ -12,7 +12,7 @@
   },
   "devDependencies": {
     "should": "^7.1.1",
-    "coap-shepherd": "^0.0.2"
+    "coap-shepherd": "^0.0.4"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

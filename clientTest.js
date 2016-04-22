@@ -46,40 +46,46 @@ coapNode.initResrc(3303, 1, {
     5701: 'F'
 });
 
-coapNode.register('127.0.0.1', 5683, function (err, msg) {
-    console.log(msg);
+coapNode.register('127.0.0.1', 5683, function (err, rsp) {
+    console.log(rsp);
 });
 
+setInterval(function () {
+    coapNode._dumpObj(3303, 0, function (err, rsp) {
+        console.log(rsp);
+    });
+}, 5000);
+
 // setTimeout(function () {
-//     coapNode.register('127.0.0.1', 5683, function (err, msg) {
-//         console.log(msg);
+//     coapNode.register('127.0.0.1', 5683, function (err, rsp) {
+//         console.log(rsp);
 //     });
 // }, 5000);
 
 // setTimeout(function () {
-//     coapNode.register('127.0.0.1', 5683, function (err, msg) {
-//         console.log(msg);
+//     coapNode.register('127.0.0.1', 5683, function (err, rsp) {
+//         console.log(rsp);
 //     });
 // }, 10000);
 
 
 // setDevAttrs test
-setTimeout(function () {
-    coapNode.setDevAttrs({ lifetime: 85741 }, function (err, msg) {
-        console.log(msg);
-    });
-}, 15000);
+// setTimeout(function () {
+//     coapNode.setDevAttrs({ lifetime: 85741 }, function (err, rsp) {
+//         console.log(rsp);
+//     });
+// }, 15000);
 
 // update test
 // setTimeout(function () {
-//     coapNode._update({ lifetime: 86400 }, function (err, msg) {
-//         console.log(msg);
+//     coapNode._update({ lifetime: 86400 }, function (err, rsp) {
+//         console.log(rsp);
 //     });
 // }, 20000);
 
 // // deregister test
 // setTimeout(function () {
-//     coapNode.deregister(function (err, msg) {
-//         console.log(msg);
+//     coapNode.deregister(function (err, rsp) {
+//         console.log(rsp);
 //     });
 // }, 30000);
