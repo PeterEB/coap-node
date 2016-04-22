@@ -3,14 +3,14 @@ coap-node
 
 ## Table of Contents
 
-1. [Overiew](#Overiew)    
+1. [Overview](#Overview)    
 2. [Features](#Features) 
 3. [Installation](#Installation) 
 4. [Usage](#Usage)
 5. [Resources Planning](#Resources)
 6. [APIs and Events](#APIs) 
 
-<a name="Overiew"></a>
+<a name="Overview"></a>
 ## 1. Overview
 
 <br />
@@ -31,7 +31,7 @@ coap-node
 
 * oid: identifier of an Object
 * iid: identifier of an Object Instance
-* rid: indetifier of a Resource
+* rid: identifier of a Resource
 
 <a name="Features"></a>
 ## 2. Features
@@ -60,7 +60,7 @@ coap-node
 <a name="Usage"></a>
 ## 4. Usage
 
-Client-side exmaple (the following example shows how you use `coap-node` on a machine node):
+Client-side example (the following example shows how you use `coap-node` on a machine node):
 
 ```js
 var CoapNode = require('coap-node');
@@ -116,7 +116,7 @@ A Resource value can be a
 (1) [Primitive value.](#Resource_simple)  
 (2) [Object with `read()` method.](#Resource_readable) It's handy when you have to read a value with particular operations, e.g. reading from a gpio.  
 (3) [Object with `write()` method.](#Resource_writeable) It's handy when you have to write a value with particular operations, e.g. write a value to a pwm output pin.  
-(4) [Object with `read()` and `write` methods.](#Resource_both)
+(4) [Object with `read()` and `write` methods.](#Resource_both)  
 (5) [Object with `exec()` method.](#Resource_executable) This helps you with designing remote procedure calls.  
 
 Let me show you some examples:  
@@ -147,7 +147,7 @@ var tempVal = gpio.read('gpio0');   // synchronously read a value from gpio
 cnode.writeResrc('temperature', 0, 'sensorValue', tempVal);
 
 // if you like to keep your 'sensorValue' updated, you have to poll 'gpio0' regularly 
-// and write the lastest read value to the Resource.
+// and write the latest read value to the Resource.
 ```
 
 <a name="Resource_readable"></a>
@@ -157,7 +157,7 @@ If reading a value requires some particular operations, e.g. reading from a gpio
 
 The signature of a read method is `function (cb)`, where `cb(err, val)` is an err-back function that you should call and pass the read value through its second argument `val` when your reading operation accomplishes. If any error occurs, pass the error through the first argument `err` to tell **coap-node** there is something bad happening.  
 
-Let me show you an exmaple:
+Let me show you an example:
 
 ```js
 cnode.initResrc('temperature', 0, {
@@ -176,7 +176,7 @@ If your Resource is an object with a read method, it will be inherently readable
 <a name="Resource_writeable"></a>
 ### (3) Initialize a Resource with write method
 
-The signature of a write method is `function (val, cb)`, where `val` is the value to wirte to this Resource and `cb(err, val)` is an err-back function that you should call and pass the written value through its second argument `val` when your writing operation accomplishes. If any error occurs, pass the error through the first argument `err`. Here is an exmaple:  
+The signature of a write method is `function (val, cb)`, where `val` is the value to wirte to this Resource and `cb(err, val)` is an err-back function that you should call and pass the written value through its second argument `val` when your writing operation accomplishes. If any error occurs, pass the error through the first argument `err`. Here is an example:  
 
 ```js
 cnode.initResrc('lightCtrl', 0, {
@@ -189,7 +189,7 @@ cnode.initResrc('lightCtrl', 0, {
 });
 ```
 
-If you initialize a Resource as an obejct with a write method, this Resource will be inherently writable. When a Server requests to write a value to an unwritable Resource, **coap-node** will respond back a special value of string '\_unwritable\_' along with a status code of '4.05'(Method Not Allowed) to the Server. [TODO] respond the string '\_unwritable\_' back, am I right? If not, take it off.  
+If you initialize a Resource as an object with a write method, this Resource will be inherently writable. When a Server requests to write a value to an unwritable Resource, **coap-node** will respond back a status code of '4.05'(Method Not Allowed) to the Server.  
 
 
 <a name="Resource_both"></a>
@@ -217,9 +217,9 @@ cnode.initResrc('lightCtrl', 0, {
 
 Finally, an executable Resource. Executable Resource allows a Server to remotely call a procedure on the Client Device. You can define some procedure calls to fit your needs with executable Resources, e.g. to ask your Device to blink a LED for 100 times and to show warning signs on a screen or something.  
 
-The signature of an exec method is `function (..., cb)`, the number of arguments depends on your own definition. The callback `cb(status, data)` is a function that you should call after its job is done. Parameter `status` is the status code you'd like to respond back to the Server. Give `status` with 'null' or '2.04' (Changed) if the operation succeeds. If any error occurs, give `status` with '4.00' (Bad Request) or a status code used in your application.  
+The signature of an exec method is `function (..., cb)`, the number of arguments depends on your own definition. The callback `cb(status)` is a function that you should call after its job is done. Parameter `status` is the status code you'd like to respond back to the Server. Give `status` with 'null' or '2.04' (Changed) if the operation succeeds. If any error occurs, give `status` with '4.00' (Bad Request) or a status code used in your application.  
 
-Here is an exmaple:
+Here is an example:
 
 ```js
 function blinkLed(led, times) {
@@ -230,10 +230,10 @@ cnode.initResrc('led', 0, {
     blink: {
         exec: function (t, cb) {
             if (typeof t !== 'number') {
-                cb('4.00', null);
+                cb('4.00');  
             } else {
                 blinkLed('led0', t);    // blink a led with t times
-                cb(null, null);         // or cb('2.04', null);
+                cb(null);               // or cb('2.04');
             }
         }
     },
@@ -247,11 +247,11 @@ If a Server requests to read or write an executable Resource, **coap-node** will
 ## 6. APIs and Events
 
 * [new CoapNode()](#API_CoapNode)
+* [setDevAttrs()](#API_setDevAttrs)
 * [initResrc()](#API_initResrc)
 * [readResrc()](#API_readResrc)
 * [writeResrc()](#API_writeResrc)
 * [register()](#API_register)
-* [setDevAttrs()](#API_setDevAttrs)
 * [deregister()](#API_deregister)
 * Events: [registered](#EVT_registered), [updated](#EVT_updated), [deregistered](#EVT_deregistered), [announce](#announce), and [error](#EVT_error)
 
@@ -311,7 +311,7 @@ Set device attributes of the cnode and send an update request to the Server.
         |------------|-----------------------|------------------------------------------------------------|
         | '2.00'     | Ok                    | No device attribute update needed.                         |
         | '2.04'     | Changed               | Set device attributes operation is completed successfully. |
-        | '4.00'     | Bad Requset           | There is an unrecognized attribute in the update request.  |
+        | '4.00'     | Bad Request           | There is an unrecognized attribute in the update request.  |
         | '4.04'     | Not Found             | The device was not registered on the Server.               |
         | '4.08'     | Timeout               | No response from the Server in 60 secs.                    |
         | '5.00'     | Internal Server Error | Something wrong with the Server.                           |
@@ -323,7 +323,7 @@ Set device attributes of the cnode and send an update request to the Server.
 **Examples:** 
 
 ```js
-// [TBD] when will this event fire? when success (2.04)? or '2.00' will do? Please give description about this.
+// This event fired when the device attributes updated (2.04). 
 cnode.on('updated', function () {
     console.log('updated');
 });
@@ -382,7 +382,7 @@ cnode.initResrc('dIn', 0, {
     dInState: {
         read: function (cb) {
             var val = gpio.read('gpio0');
-            cb(null, val)
+            cb(null, val);
         }
     },
 });
@@ -395,7 +395,7 @@ cnode.initResrc('dOut', 0, {
     dOutState: {
         write: function (val, cb) {
             gpio.write('gpio0', val);
-            cb(null, val)
+            cb(null, val);
         }
     },
 });
@@ -408,7 +408,7 @@ cnode.initResrc('led', 0, {
     blink: {
         exec: function (t, cb) {
             blinkLed('led0', t);    // bink led0 for t times
-            cb(null, null)          // [TBD] no status for cb()? null is default a success? Please describe this.
+            cb(null);               // cb(status), give `status` with 'null' or '2.04' if the operation succeeds.
         }
     },
 });
@@ -425,7 +425,7 @@ Read a value from the allocated Resource.
 3. `rid` (_String_ | _Number_): Resource id of the allocated Resource.  
 4. `callback` (_Function_): `function (err, val) { }`, where `val` is the read result.  
 
-    If the Resource is not a simple value and there has not a read method been initialized for it, the `val` passes to the callback will be a string `\_unreadable\_`. If the Resource is an executable resource, the `val` passes to the callback will be a string `\_exec\_`. If the Resource is not found, an error will be passed to fisrt argument of the callback.  
+    If the Resource is not a simple value and there has not a read method been initialized for it, the `val` passes to the callback will be a string `\_unreadable\_`. If the Resource is an executable resource, the `val` passes to the callback will be a string `\_exec\_`. If the Resource is not found, an error will be passed to first argument of the callback.  
 
 **Returns:**  
 
@@ -459,7 +459,7 @@ Write a value to the allocated Resource.
 4. `value` (_Depends_): value to write to the allocated Resource.  
 5. `callback` (_Function_): `function (err, val) { }`, where `val` is the written value.  
 
-    If the Resource is not a simple value and there has not a write method been initialized for it, the `val` passes to the callback will be a string `\_unwritable\_`. If the Resource is an executable Resource, the `val` passes to the callback will be a string `\_exec\_`. If the allocated Resource is not found, an error will be passed to fisrt argument of the callback.  
+    If the Resource is not a simple value and there has not a write method been initialized for it, the `val` passes to the callback will be a string `\_unwritable\_`. If the Resource is an executable Resource, the `val` passes to the callback will be a string `\_exec\_`. If the allocated Resource is not found, an error will be passed to first argument of the callback.  
 
 **Returns:**  
 
@@ -497,7 +497,7 @@ Send a register request to the Server.
         |------------|-----------------------|---------------------------------------------------------------------------|
         | '2.01'     | Created               | Register operation is completed successfully.                             |
         | '2.04'     | Changed               | Re-registration and updating device attributes is completed successfully. |
-        | '4.00'     | Bad Requset           | Request packet has no clientName or objList attribute in it.              |
+        | '4.00'     | Bad Request           | Request packet has no clientName or objList attribute in it.              |
         | '4.05'     | Not Allowed           | The Server is not allowed for registration.                               |
         | '4.08'     | Timeout               | No response from the Server in 60 secs.                                   |
         | '5.00'     | Internal Server Error | Something wrong with the Server.                                          |
