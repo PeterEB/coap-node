@@ -60,7 +60,7 @@ coap-node
 <a name="Usage"></a>
 ## 4. Usage
 
-Client-side example (the following example shows how you use `coap-node` on a machine node):
+Client-side example (the following example is how you use `coap-node` on a machine node):
 
 ```js
 var CoapNode = require('coap-node');
@@ -149,6 +149,8 @@ cnode.writeResrc('temperature', 0, 'sensorValue', tempVal);
 // if you like to keep your 'sensorValue' updated, you have to poll 'gpio0' regularly 
 // and write the latest read value to the Resource.
 ```
+
+If your Resource is a primitive value, it will be inherently readable and writable.
 
 <a name="Resource_readable"></a>
 ### (2) Initialize a Resource with read method
@@ -278,12 +280,12 @@ Create a new instance of CoapNode class.
 
 **Returns:**  
 
-* (none)
+* (_Object_): cnode.
 
 **Examples:** 
 
 ```js
-var CoapNode = require('./lib/coap-node.js');
+var CoapNode = require('coap-node');
 
 var cnode = new CoapNode('foo_name');
 ```
@@ -509,6 +511,7 @@ Send a register request to the Server.
 **Examples:** 
 
 ```js
+// This event fired when the device registered (2.01).
 cnode.on('registered', function () {
     console.log('registered');
 });
@@ -543,6 +546,7 @@ Send a deregister request to the Server.
 **Examples:** 
 
 ```js
+// This event fired when the device deregistered (2.02).
 cnode.on('deregistered', function () {
     console.log('deregistered');
 });

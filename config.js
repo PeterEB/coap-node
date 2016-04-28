@@ -31,8 +31,8 @@ module.exports = {
     reqTimeout: 60,
 
     // how often to sent heartbeat.
-    // default is 30 secs.
-    heartbeatTime: 30,
+    // default is 20 secs.
+    heartbeatTime: 20,
 
     // how often to check the socket is not used.
     // default is 60 secs.
