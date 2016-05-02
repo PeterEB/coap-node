@@ -3,32 +3,26 @@ coap-node
 
 ## Table of Contents
 
-1. [Overview](#Overview)    
-2. [Features](#Features) 
-3. [Installation](#Installation) 
-4. [Usage](#Usage)
-5. [Resources Planning](#Resources)
-6. [APIs and Events](#APIs) 
+1. [Overview](#Overview)  
+2. [Features](#Features)  
+3. [Installation](#Installation)  
+4. [Usage](#Usage)  
+5. [Resources Planning](#Resources)  
+6. [APIs and Events](#APIs)  
+7. [Code Templates](#Templates)  
+
 
 <a name="Overview"></a>
 ## 1. Overview
 
-<br />
+[**OMA Lightweight M2M**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) (LWM2M) is a resource constrained device management protocol relies on [**CoAP**](https://tools.ietf.org/html/rfc7252). And **CoAP** is an application layer protocol that allows devices to communicate with each other RESTfully over the Internet.  
 
-[---- WAITING FOR REVISING, Ignore this section ----]
+**coap-node** is a module that aims to provide a simple way to build M2M/IoT client devices managed by a **coap-shepherd** server. This module follows [**IPSO**](http://www.ipso-alliance.org/smart-object-guidelines/) data model to well organize and define resources on a machine node. This document also provides [templates](#Templates) of many common devices defined by [IPSO Smart Objects starter pack 1.0](http://www.ipso-alliance.org/smart-object-guidelines/), i.e., temperature sensor, humidity sensor, light control. It is easy to add new Objects and Resources to fit your needs.  
 
-<br />
+###Acronyms and Abbreviations
 
-<br />
-
-[**CoAP**](https://tools.ietf.org/html/rfc7252) is an application layer protocol based on RESTful intended to be used in resource constrained internet devices such as M2M or IoT that allows them to communicate interactively over the Internet. [**OMA Lightweight M2M**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) (LWM2M) is a resource constrained device management protocol relies on **CoAP**. 
-
-[**coap-shepherd**](https://github.com/PeterEB/coap-shepherd) is an implementation of **CoAP** device management Server with Node.js that follows part of **LWM2M** specification to achieve machine network management.
-
-**coap-node** is implemented as a client of **coap-shepherd**, aims to provide a simple way to build the M2M or IoT device. This module uses **IPSO** Smart Objects which defines application Objects using the LWM2M Object Model by [Smart Objects Guidelines](http://www.ipso-alliance.org/smart-object-guidelines/), so it is easy to add new Object and Resource as needed.
-
-###Acronym
-
+* **Server**: LWM2M Server (server running with [coap-shepherd](https://github.com/PeterEB/coap-shepherd))  
+* **Client** or **Client Device**: LWM2M Client (machine running with [coap-node](https://github.com/PeterEB/coap-node))  
 * oid: identifier of an Object
 * iid: identifier of an Object Instance
 * rid: identifier of a Resource
@@ -37,20 +31,10 @@ coap-node
 ## 2. Features
 
 * CoAP protocol  
-* Based on [node-coap](https://github.com/mcollina/node-coap) library  
-* Ready to provide CoAP services at machine node  
-* LWM2M interfaces for Client/Server interaction  
-* Smart-Object-style (IPSO) and easy to create a Resource on a Client Device  
-
-<br />
-
-<br />
-
-[---- END: WAITING FOR REVISING, Ignore this section ----]
-
-<br />
-
-<br />
+* Based on [node-coap](https://github.com/mcollina/node-coap), a node.js CoAP client/server library  
+* CoAP services at machine node is off-the-shelf  
+* Hierarchical data model in Smart-Object-style (IPSO) let you easily create Resources on the Client Device  
+* Client/server interaction through LWM2M-defined interfaces  
 
 <a name="Installation"></a>
 ## 3. Installation
@@ -113,7 +97,7 @@ With **coap-node**, all you have to do is to plan your Resources well on the mac
 Use `initResrc(oid, iid, resrcs)` method to help you with initializing your Resources. A Resource value can be a  
 [primitive value](#Resource_simple), an [object with read() method](#Resource_readable), an [object with write() method](#Resource_writeable), an [object with read() and write() methods](#Resource_both), and an [object with exec() method.](#Resource_executable).  
 
-Here is the [tutorial about how to initialize your Resources](#https://github.com/PeterEB/coap-node/blob/develop/docs/rsc_plan.md) on the client node. Here, I'm showing you some quick examples:  
+Here is the [tutorial about how to initialize your Resources](https://github.com/PeterEB/coap-node/blob/develop/docs/rsc_plan.md) on the client node. Here, I'm showing you some quick examples:  
 
 <a name="Resource_simple"></a>
 #### (1) Initialize a Resource as a primitive value
@@ -538,3 +522,31 @@ Fired when there is an announce from the Server.
 Fired when there is an error occurred.  
 
 *************************************************
+
+  
+<br />
+
+<a name="Templates"></a>
+## 7. Code Templates
+
+[Here is the document](https://github.com/PeterEB/coap-node/blob/develop/docs/templates.md) that provides you with many code templates of IPSO-defined devices. Each template gives the code snippet of how to initialize an Object Instance with its oid and iid, and lists every Resource the Object Instance may have.  
+
+The following example shows how to create an **digital input** Object Instance. In the code snippet, commented lines are optional Resources. A phrase `< rid = 5500, R, Boolean >` tells the access permission and data type of a Resource.  
+  
+```js
+// Create an Object Instance: Digital Input (oid = 3200 or 'dIn')
+
+cnode.initResrc('dIn', 0, {
+    dInState: {                     // < rid = 5500, R, Boolean >
+        read: function (cb) {}
+    },
+    // counter: ,                   // < rid = 5501,  R, Integer >
+    // dInPolarity: ,               // < rid = 5502, RW, Boolean >
+    // debouncePeriod: ,            // < rid = 5503, RW, Integer, ms >
+    // edgeSelection: ,             // < rid = 5504, RW, Integer { 1: fall, 2: rise, 3: both } >
+    // counterReset: ,              // < rid = 5505,  E, Opaque >
+    // appType: ,                   // < rid = 5750, RW, String >
+    // sensorType:                  // < rid = 5751,  R, String >
+});
+```
+
