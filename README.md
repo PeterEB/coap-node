@@ -111,9 +111,9 @@ cnode.write('/temperature/1/sensorValue', function (err, rsp) {
 With **coap-node**, all you have to do is to plan your Resources well on the machine. **coap-node** will automatically tackle the response things for you with respect to requests from a Server. **coap-node** is trying to lower down your effort of designing client nodes in a machine network.  
 
 Use `initResrc(oid, iid, resrcs)` method to help you with initializing your Resources. A Resource value can be a  
-[primitive value](#Resource_simple), an [object with read() method](#Resource_readable), an [object with write() method](#Resource_writeable), an [object with read() and write methods](#Resource_both), and an [object with `exec()` method.](#Resource_executable).  
+[primitive value](#Resource_simple), an [object with read() method](#Resource_readable), an [object with write() method](#Resource_writeable), an [object with read() and write() methods](#Resource_both), and an [object with exec() method.](#Resource_executable).  
 
-Here is the [tutorial about how to initialize your Resources](#temp) on the client node. Here, I'm showing you some quick examples:  
+Here is the [tutorial about how to initialize your Resources](#https://github.com/PeterEB/coap-node/blob/develop/docs/rsc_plan.md) on the client node. Here, I'm showing you some quick examples:  
 
 <a name="Resource_simple"></a>
 #### (1) Initialize a Resource as a primitive value
