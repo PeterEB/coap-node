@@ -18,8 +18,8 @@ module.exports = {
     version: '1.0.0',
 
     // Minimum time in seconds the Client Device should wait between two notifications.
-    // default is 1 secs.
-    defaultMinPeriod: 1,
+    // default is 0 secs.
+    defaultMinPeriod: 0,
 
     // Maximum Period. Maximum time in seconds the Client Device should wait between two notifications. 
     // When maximum time expires after the last notification, a new notification should be sent.

@@ -2,7 +2,7 @@ Resources Planning Tutorial
 ========================
 
 To initialize your Resources, use `initResrc(oid, iid, resrcs)` method, where parameters:
-* `oid` is the the Object identifier
+* `oid` is the Object identifier
 * `iid` is the Object Instance identifier
 * `resrcs` is an object containing all Resources in this Object Instance. Each key in this object should be an `rid` and each value is its corresponding Resource value.  
 

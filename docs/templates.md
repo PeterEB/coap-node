@@ -2,7 +2,7 @@
 
 This document provides you with code templates of many IPSO-defined devices [(Smart Objects starter pack 1.0)](http://www.ipso-alliance.org/smart-object-guidelines/). Just copy the templates you need to your code. Each template gives the code snippet of how to initialize an Object Instance with its oid and iid, and lists every Resource the Object Instance may have.  
 
-* In the code snippet, commented lines are optional Resources.You are free to uncomment and define those optional Resources you like to use within an Object Instance.  
+* In the code snippet, commented lines are optional Resources. You are free to uncomment and define those optional Resources you like to use within an Object Instance.  
 
 * A phrase `< rid number, access, data type { range or enum }, unit >` tells the number of resource id, access permission, and data type of a Resource.  
 
