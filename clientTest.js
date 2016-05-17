@@ -50,11 +50,11 @@ coapNode.register('127.0.0.1', 5683, function (err, rsp) {
     console.log(rsp);
 });
 
-// setInterval(function () {
-//     coapNode._dumpObj(3303, 0, function (err, rsp) {
-//         console.log(rsp);
-//     });
-// }, 8000);
+setInterval(function () {
+    coapNode._dumpObj(3303, 0, function (err, rsp) {
+        console.log(rsp);
+    });
+}, 8000);
 
 // setTimeout(function () {
 //     coapNode.register('127.0.0.1', 5683, function (err, rsp) {
