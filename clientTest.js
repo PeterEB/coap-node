@@ -18,6 +18,10 @@ coapNode.on('announce', function (msg) {
     console.log('announce: ' + msg);
 });
 
+coapNode.on('error', function (err) {
+    console.log('error: ' + err);
+});
+
 coapNode.initResrc(3303, 0, {
     sensorValue: 21,
     units: 'C',
