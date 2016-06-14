@@ -31,6 +31,14 @@ var iObj = {
     }
 };
 
+shepherd.on('error', function (err) {
+    console.log(err);
+});
+
+node.on('error', function (err) {
+    console.log(err);
+});
+
 describe('coap-node device-managment test', function() {
     this.timeout(15000);
     
@@ -67,7 +75,7 @@ describe('coap-node device-managment test', function() {
         });
 
         node.port = 9043;
-        
+
         it('register - node', function (done) {
             shepherd.permitJoin(300);
 

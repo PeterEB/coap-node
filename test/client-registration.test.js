@@ -6,6 +6,14 @@ var CoapNode = require('../lib/coap-node');
 
 var node = new CoapNode('utNode');
 
+shepherd.on('error', function (err) {
+    console.log(err);
+});
+
+node.on('error', function (err) {
+    console.log(err);
+});
+
 describe('coap-node registration test', function() {
     this.timeout(15000);
     
