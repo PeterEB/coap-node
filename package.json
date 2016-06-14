@@ -1,6 +1,6 @@
 {
   "name": "coap-node",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "An ip-based M2M/IoT client devices managed by a coap-shepherd server.",
   "main": "index.js",
   "dependencies": {
