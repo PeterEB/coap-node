@@ -1,6 +1,12 @@
-var CoapNode = require('./lib/coap-node.js');
+var CoapNode = require('./index.js');
 
 var coapNode = new CoapNode('nodeTest');
+
+coapNode.on('ready', function (msg) {
+    coapNode.register('127.0.0.1', 5683, function (err, rsp) {
+        console.log(rsp);
+    });
+});
 
 coapNode.on('registered', function () {
     console.log('registered');
@@ -50,9 +56,7 @@ coapNode.initResrc(3303, 1, {
     5701: 'F'
 });
 
-coapNode.register('127.0.0.1', 5683, function (err, rsp) {
-    console.log(rsp);
-});
+coapNode.start();
 
 setInterval(function () {
     coapNode._dumpObj(3303, 0, function (err, rsp) {

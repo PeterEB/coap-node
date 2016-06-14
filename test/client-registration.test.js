@@ -2,7 +2,7 @@ var should = require('should'),
     _ = require('lodash'),
     shepherd = require('coap-shepherd');
 
-var CoapNode = require('../coap-node');
+var CoapNode = require('../lib/coap-node');
 
 var node = new CoapNode('utNode');
 
@@ -10,6 +10,9 @@ describe('coap-node registration test', function() {
     this.timeout(15000);
     
     describe('start connection test', function() {
+        shepherd._net.port = 9042;
+        shepherd._clientDefaultPort = 9043;
+
         it('start - shepherd', function (done) {
             shepherd.start(function () {
                 done();
@@ -18,27 +21,26 @@ describe('coap-node registration test', function() {
     });
 
     describe('coap-node tries to register', function() {
+        node.port = 9043;
+
         it('register - register', function (done) {
             shepherd.permitJoin(300);
-            node.register('127.0.0.1', '5683', function (err, msg) {
-                var cn;
-                if (msg.status === '2.01' || msg.status === '2.04') {
-                    cn = shepherd.find('utNode');
-                    should(cn._registered).be.eql(true);
-                    done();
-                }
+
+            node.start(function () {
+                node.register('127.0.0.1', 9042, function (err, msg) {
+                    var cn;
+                    if (msg.status === '2.01' || msg.status === '2.04') {
+                        cn = shepherd.find('utNode');
+                        should(cn._registered).be.eql(true);
+                        done();
+                    }
+                });
             });
         });
 
         it('register - register again', function (done) {
-            node.register('127.0.0.1', '5683', function (err, msg) {
+            node.register('127.0.0.1', 9042, function (err, msg) {
                 if (msg.status === '2.04') done();
-            });
-        });
-        
-        it('register - wrong ip', function (done) {
-            node.register('124.0.0.1', '5683', function (err, msg) {
-                if (msg.status === '4.08') done();
             });
         });
     });

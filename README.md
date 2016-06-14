@@ -1,5 +1,10 @@
 coap-node
 ========================
+[![NPM](https://nodei.co/npm/coap-node.png?downloads=true)](https://nodei.co/npm/coap-node/)  
+
+[![Build Status](https://travis-ci.org/PeterEB/coap-node.svg?branch=develop)](https://travis-ci.org/PeterEB/coap-node)
+[![npm](https://img.shields.io/npm/v/coap-node.svg?maxAge=2592000)](https://www.npmjs.com/package/coap-node)
+[![npm](https://img.shields.io/npm/l/coap-node.svg?maxAge=2592000)](https://www.npmjs.com/package/coap-node)
 
 ## Table of Contents
 
@@ -63,16 +68,23 @@ cnode.initResrc('temperature', 1, {
     units: 'F'
 });
 
+cnode.on('ready', function () {
+    // If the start procedure completes successfully, 'ready' will be fired
+
+    // register to a Server with its ip and port
+    cnode.register('192.168.0.77', 5683, function (err, rsp) {
+        console.log(rsp);      // { status: '2.05' }
+    });
+});
+
+
 cnode.on('registered', function () {
     // If the registration procedure completes successfully, 'registered' will be fired
 
     // after registered, start your application
 });
 
-// register to a Server with its ip and port
-cnode.register('192.168.0.77', 5683, function (err, rsp) {
-    console.log(rsp);      // { status: '2.05' }
-});
+cnode.start();
 ```
 
 Server-side example (please go to [coap-shepherd](https://github.com/PeterEB/coap-shepherd) document for details):
@@ -182,13 +194,14 @@ cnode.initResrc('led', 0, {
 ## 6. APIs and Events
 
 * [new CoapNode()](#API_CoapNode)
+* [start()](#API_start)
 * [setDevAttrs()](#API_setDevAttrs)
 * [initResrc()](#API_initResrc)
 * [readResrc()](#API_readResrc)
 * [writeResrc()](#API_writeResrc)
 * [register()](#API_register)
 * [deregister()](#API_deregister)
-* Events: [registered](#EVT_registered), [updated](#EVT_updated), [deregistered](#EVT_deregistered), [announce](#announce), and [error](#EVT_error)
+* Events: [ready](#EVT_ready), [registered](#EVT_registered), [updated](#EVT_updated), [deregistered](#EVT_deregistered), [announce](#announce), and [error](#EVT_error)
 
 *************************************************
 ## CoapNode Class
@@ -221,6 +234,38 @@ Create a new instance of CoapNode class.
 var CoapNode = require('coap-node');
 
 var cnode = new CoapNode('foo_name');
+```
+
+*************************************************
+<a name="API_start"></a>
+### start([devInfo, callback])
+
+**Arguments:** 
+
+1. `devInfo` (_Object_): Device information. There are 9 attributes of `devInfo` including `manuf`, `model`, `serial`, `firmware`, `devType`, `hwVer`, `swVer`, `availPwrSrc` and `pwrSrcVoltage`
+2. `callback` (_Function_): `function (err, msg) { }`. Get called after the cnode started. `msg` is the message object with network information.  
+
+**Returns:**  
+
+* (none)
+
+**Examples:** 
+
+```js
+// This event fired when the device started. 
+cnode.on('ready', function () {
+    console.log('ready');
+});
+
+var devInfo = {
+    manuf: 'sivann',
+    serial: 'c-0001',
+    pwrSrcVoltage: '5V'
+};
+
+cnode.start(devInfo, function (err, msg) {
+    console.log(msg);   // { ip: '192.168.1.117', mac: '00:0c:7f:5d:ac:2d', routeIp: '192.168.1.1' }
+});
 ```
 
 *************************************************
@@ -488,6 +533,12 @@ cnode.deregister(function (err, rsp) {
     console.log(rsp);   // { status: '2.02' }
 });
 ```
+
+*************************************************
+<a name="EVT_ready"></a>
+### Event: 'ready'
+`function () { }`
+Fired when the Device started.  
 
 *************************************************
 <a name="EVT_registered"></a>
