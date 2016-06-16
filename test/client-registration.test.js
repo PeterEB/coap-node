@@ -31,19 +31,48 @@ describe('coap-node registration test', function() {
         it('register - register', function (done) {
             shepherd.permitJoin(300);
 
+            var devRegHdlr = function (msg) {
+                    switch(msg.type) {
+                        case 'registered':
+                            if (msg.data.clientName === 'utNode') {
+                                shepherd.removeListener('ind', devRegHdlr);
+                                done(); 
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                };
+
+            shepherd.on('ind', devRegHdlr);
+
             node.register('127.0.0.1', 5683, function (err, msg) {
                 var cn;
                 if (msg.status === '2.01' || msg.status === '2.04') {
                     cn = shepherd.find('utNode');
                     should(cn._registered).be.eql(true);
-                    done();
                 }
             });
         });
 
         it('register - register again', function (done) {
+            var devRegHdlr = function (msg) {
+                switch(msg.type) {
+                    case 'registered':
+                        if (msg.data.clientName === 'utNode') {
+                            shepherd.removeListener('ind', devRegHdlr);
+                            done(); 
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            };
+
+            shepherd.on('ind', devRegHdlr);
+
             node.register('127.0.0.1', 5683, function (err, msg) {
-                if (msg.status === '2.04') done();
+                should(msg.status).be.eql('2.04');
             });
         });
     });
