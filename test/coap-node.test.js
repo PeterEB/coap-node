@@ -36,14 +36,12 @@ describe('Constructor Check', function () {
                 }
             };
 
-        node.start();
-
         should(node.clientName).be.eql('utNode');
         should(node.locationPath).be.eql('unknown');
         should(node.lifetime).be.eql(86400);
         should(node.version).be.eql('1.0.0');  
         should(node.ip).be.eql('unknown');
-        should(node.port).be.eql(5684);
+        should(node.port).be.null();
         should(node._serverIp).be.null();
         should(node._serverPort).be.null();
         should(node.objList).be.null();

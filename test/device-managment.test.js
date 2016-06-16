@@ -65,28 +65,35 @@ describe('coap-node device-managment test', function() {
     });
 
     describe('start connection test', function() {
-        shepherd._net.port = 9042;
-        shepherd._clientDefaultPort = 9043;
-
         it('start - shepherd', function (done) {
             shepherd.start(function () {
                 done();
             });
         });
 
-        node.port = 9043;
-
         it('register - node', function (done) {
             shepherd.permitJoin(300);
 
-            node.start(function () {
-                node.register('127.0.0.1', 9042, function (err, msg) {
-                    if (msg.status === '2.01' || msg.status === '2.04') {
-                        remoteNode = shepherd.find('utNode');
-                        should(remoteNode._registered).be.eql(true);
-                        done();
+            var devRegHdlr = function (msg) {
+                    switch(msg.type) {
+                        case 'registered':
+                            if (msg.data.clientName === 'utNode') {
+                                shepherd.removeListener('ind', devRegHdlr);
+                                done(); 
+                            }
+                            break;
+                        default:
+                            break;
                     }
-                });
+                };
+
+            shepherd.on('ind', devRegHdlr);
+
+            node.register('127.0.0.1', 5683, function (err, msg) {
+                if (msg.status === '2.01' || msg.status === '2.04') {
+                    remoteNode = shepherd.find('utNode');
+                    should(remoteNode._registered).be.eql(true);
+                }
             });
         });
     });
@@ -94,6 +101,7 @@ describe('coap-node device-managment test', function() {
     describe('coap-shepherd tries to read', function() {
         it('read - resource', function (done) {
             remoteNode.read('/temperature/0/sensorValue', function (err, msg) {
+                console.log(err);
                 if (msg.status === '2.05') {
                     should(msg.data).be.eql(21);
                     done();

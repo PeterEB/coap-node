@@ -2,10 +2,6 @@
 
 module.exports = {
 
-    // the cserver's COAP server will start listening.
-    // default is 5683.
-    defaultPort: 5684,
-
     // indicates if the server should create IPv4 connections (udp4) or IPv6 connections (udp6).
     // default is udp4.
     connectionType: 'udp4',
