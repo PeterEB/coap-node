@@ -1,5 +1,5 @@
 var should = require('should'),
-    _ = require('lodash'),
+    _ = require('busyman'),
     shepherd = require('coap-shepherd');
 
 var CoapNode = require('../lib/coap-node');

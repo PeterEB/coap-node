@@ -1,5 +1,5 @@
 var should = require('should'),
-    _ = require('lodash'),
+    _ = require('busyman'),
     CoapNode = require('../lib/coap-node');
 
 var node = new CoapNode('utNode');
@@ -9,7 +9,7 @@ describe('Constructor Check', function () {
         var defSo = {
                 lwm2mServer: {
                     0: {  // oid = 1
-                        shortServerId: null,        
+                        shortServerId: 'unknown',        
                         lifetime: 86400,   
                         defaultMinPeriod: 0,       
                         defaultMaxPeriod: 60        
