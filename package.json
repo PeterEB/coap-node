@@ -7,8 +7,7 @@
     "busyman": "^0.1.1",
     "coap": "^0.14.0",
     "lwm2m-id": "^1.2.3",
-    "network": "^0.1.3",
-    "smartobject": "0.0.2"
+    "network": "^0.1.3"
   },
   "devDependencies": {
     "coap-shepherd": "^0.1.0",

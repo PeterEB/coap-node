@@ -28,9 +28,9 @@ coapNode.initResrc(3303, 0, {
         }
     },
     5703: { 
-        write: function (val, cb) {
-            console.log('write ' + val);
-            cb(null, val);
+        read: function (cb) {
+            var time = new Date();
+            cb(null, time.toString());
         }
     },
     5704: { 

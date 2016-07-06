@@ -24,8 +24,8 @@ describe('Constructor Check', function () {
                         devType: 'generic',         // rid = 17
                         hwVer: 'v1.0',              // rid = 18
                         swVer: 'v1.0',              // rid = 19
-                        availPwrSrc:'line',
-                        pwrSrcVoltage: '3.3V'
+                        availPwrSrc:'unknown',
+                        pwrSrcVoltage: 'unknown'
                     }
                 },
                 connMonitor: {
@@ -41,11 +41,14 @@ describe('Constructor Check', function () {
         should(node.lifetime).be.eql(86400);
         should(node.version).be.eql('1.0.0');  
         should(node.ip).be.eql('unknown');
-        should(node.port).be.null();
-        should(node._serverIp).be.null();
-        should(node._serverPort).be.null();
+        should(node.port).be.eql('unknown');
+        
+        should(node._serverIp).be.eql('unknown');
+        should(node._serverPort).be.eql('unknown');
+
         should(node.objList).be.null();
         should(node.so).be.eql(defSo);
+
         should(node._registered).be.false();
         should(node._lfsecs).be.eql(0);
         should(node._updater).be.null();
