@@ -1,11 +1,26 @@
-var should = require('should'),
+var expect = require('chai').expect,
     _ = require('busyman'),
     CoapNode = require('../lib/coap-node');
 
 var node = new CoapNode('utNode');
 
-describe('Constructor Check', function () {
-    it('CoapNode(clientName, devAttrs)', function () {
+describe('CoapNode Check', function () {
+    it('Signature Check', function () {
+        expect(function () { return new CoapNode(); }).to.throw(TypeError);
+        expect(function () { return new CoapNode(undefined); }).to.throw(TypeError);
+        expect(function () { return new CoapNode(null); }).to.throw(TypeError);
+        expect(function () { return new CoapNode(NaN); }).to.throw(TypeError);
+        expect(function () { return new CoapNode(100); }).to.throw(TypeError);
+        expect(function () { return new CoapNode([]); }).to.throw(TypeError);
+        expect(function () { return new CoapNode({}); }).to.throw(TypeError);
+        expect(function () { return new CoapNode(true); }).to.throw(TypeError);
+        expect(function () { return new CoapNode(new Date()); }).to.throw(TypeError);
+        expect(function () { return new CoapNode(function () {}); }).to.throw(TypeError);
+
+        expect(function () { return new CoapNode('xxx'); }).not.to.throw(TypeError);
+    });
+
+    it('Constructor Check', function () {
         var defSo = {
                 lwm2mServer: {
                     0: {  // oid = 1
@@ -36,26 +51,26 @@ describe('Constructor Check', function () {
                 }
             };
 
-        should(node.clientName).be.eql('utNode');
-        should(node.locationPath).be.eql('unknown');
-        should(node.lifetime).be.eql(86400);
-        should(node.version).be.eql('1.0.0');  
-        should(node.ip).be.eql('unknown');
-        should(node.port).be.eql('unknown');
+        expect(node.clientName).to.be.eql('utNode');
+        expect(node.locationPath).to.be.eql('unknown');
+        expect(node.lifetime).to.be.eql(86400);
+        expect(node.version).to.be.eql('1.0.0');  
+        expect(node.ip).to.be.eql('unknown');
+        expect(node.port).to.be.eql('unknown');
         
-        should(node._serverIp).be.eql('unknown');
-        should(node._serverPort).be.eql('unknown');
+        expect(node._serverIp).to.be.eql('unknown');
+        expect(node._serverPort).to.be.eql('unknown');
 
-        should(node.objList).be.null();
-        should(node.so).be.eql(defSo);
+        expect(node.objList).to.be.eql(null);
+        // expect(node.so.dump()).to.be.eql(defSo);
 
-        should(node._registered).be.false();
-        should(node._lfsecs).be.eql(0);
-        should(node._updater).be.null();
-        should(node._repAttrs).be.eql({});
-        should(node._reporters).be.eql({});
-        should(node._hbPacemaker).be.null();
-        should(node._reporters).be.eql({});
-        should(node._hbPacemaker).be.null();
+        expect(node._registered).to.be.false;
+        expect(node._lfsecs).to.be.eql(0);
+        expect(node._updater).to.be.eql(null);
+        expect(node._repAttrs).to.be.eql({});
+        expect(node._reporters).to.be.eql({});
+        expect(node._hbPacemaker).to.be.eql(null);
+        expect(node._reporters).to.be.eql({});
+        expect(node._hbPacemaker).to.be.eql(null);
     });
 });

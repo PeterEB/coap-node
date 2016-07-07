@@ -213,7 +213,6 @@ Create a new instance of CoapNode class.
     |  Property  | Type   | Required | Description |
     |------------|--------|----------|-------------|
     |  lifetime  | Number | optional | Registration will be removed by the server if a new registration or update from cnode is not received within `lifetime` seconds. Default is 86400 (seconds) |
-    |  ip        | String | optional | Device ip address               |
     |  version   | String | optional | Minimum supported LWM2M version |
 
 **Returns:**  
@@ -240,7 +239,6 @@ Set device attributes of the cnode and send an update request to the Server.
     |  Property  | Type   | Required |
     |------------|--------|----------|
     | lifetime   | Number | optional | 
-    | ip         | String | optional |
     | version    | String | optional |
 
 2. `callback` (_Function_): `function (err, rsp) { }`. Get called after the Server accomplishes the update. `rsp` is the response object with a status code to tell whether this operation is successful.  

@@ -1,4 +1,4 @@
-var should = require('should'),
+var expect = require('chai').expect,
     _ = require('busyman'),
     shepherd = require('coap-shepherd');
 
@@ -43,24 +43,21 @@ describe('coap-node device-managment test', function() {
     this.timeout(15000);
     
     describe('coap-node tries to init resource', function() {
-        it('initResrc - initResrc', function (done) {
+        it('initResrc - initResrc', function () {
             node.initResrc('temperature', 0, iObj);
-            should(node.so.temperature[0]).be.eql(iObj);
-            done();
+            expect(node.so.temperature[0]).to.be.eql(iObj);
         });
 
-        it('initResrc - wrong oid', function (done) {
-            (function () { return node.initResrc([], 0, iObj); }).should.throw();
-            (function () { return node.initResrc({}, 0, iObj); }).should.throw();
-            done();
+        it('initResrc - wrong oid', function () {
+            expect(function () { return node.initResrc([], 0, iObj); }).to.throw(Error);
+            expect(function () { return node.initResrc({}, 0, iObj); }).to.throw(Error);
         });
 
-        it('initResrc - wrong resrc', function (done) {
-            (function () { return node.initResrc('temperature', 0, 'x'); }).should.throw();
-            (function () { return node.initResrc('temperature', 0, 1); }).should.throw();
-            (function () { return node.initResrc('temperature', 0, []); }).should.throw();
-            (function () { return node.initResrc('temperature', 0, function () {}); }).should.throw();
-            done();
+        it('initResrc - wrong resrc', function () {
+            expect(function () { return node.initResrc('temperature', 0, 'x'); }).to.throw(Error);
+            expect(function () { return node.initResrc('temperature', 0, 1); }).to.throw(Error);
+            expect(function () { return node.initResrc('temperature', 0, []); }).to.throw(Error);
+            expect(function () { return node.initResrc('temperature', 0, function () {}); }).to.throw(Error);
         });
     });
 
@@ -92,7 +89,7 @@ describe('coap-node device-managment test', function() {
             node.register('127.0.0.1', 5683, function (err, msg) {
                 if (msg.status === '2.01' || msg.status === '2.04') {
                     remoteNode = shepherd.find('utNode');
-                    should(remoteNode._registered).be.eql(true);
+                    expect(remoteNode._registered).to.be.true;
                 }
             });
         });
@@ -102,7 +99,7 @@ describe('coap-node device-managment test', function() {
         it('read - resource', function (done) {
             remoteNode.readReq('/temperature/0/sensorValue', function (err, msg) {
                 if (msg.status === '2.05') {
-                    should(msg.data).be.eql(21);
+                    expect(msg.data).to.be.eql(21);
                     done();
                 }
             });
@@ -111,7 +108,7 @@ describe('coap-node device-managment test', function() {
         it('read - resource is unreadable', function (done) {
             remoteNode.readReq('/temperature/0/5703', function (err, msg) {
                 if (msg.status === '4.05') {
-                    should(msg.data).be.eql('_unreadable_');
+                    expect(msg.data).to.be.eql('_unreadable_');
                     done();
                 }
             });
@@ -120,7 +117,7 @@ describe('coap-node device-managment test', function() {
         it('read - resource is exec', function (done) {
             remoteNode.readReq('/temperature/0/5704', function (err, msg) {
                 if (msg.status === '4.05') {
-                    should(msg.data).be.eql('_exec_');
+                    expect(msg.data).to.be.eql('_exec_');
                     done();
                 }
             });
@@ -137,7 +134,7 @@ describe('coap-node device-managment test', function() {
                     };
 
                 if (msg.status === '2.05') {
-                    should(msg.data).be.eql(inst);
+                    expect(msg.data).to.be.eql(inst);
                     done();
                 }
             });
@@ -156,7 +153,7 @@ describe('coap-node device-managment test', function() {
                     };
 
                 if (msg.status === '2.05') {
-                    should(msg.data).be.eql(obj);
+                    expect(msg.data).to.be.eql(obj);
                     done();
                 }
             });
@@ -289,7 +286,7 @@ describe('coap-node device-managment test', function() {
 
             remoteNode.discoverReq('/temperature/0/sensorValue', function (err, msg) {
                 if (msg.status === '2.05') {
-                    should(msg.data).be.eql(result);
+                    expect(msg.data).to.be.eql(result);
                     done();
                 }
             });
@@ -303,7 +300,7 @@ describe('coap-node device-managment test', function() {
             
             remoteNode.discoverReq('/temperature/0', function (err, msg) {
                 if (msg.status === '2.05') {
-                    should(msg.data).be.eql(result);
+                    expect(msg.data).to.be.eql(result);
                     done();
                 }
             });
@@ -317,7 +314,7 @@ describe('coap-node device-managment test', function() {
             
             remoteNode.discoverReq('/temperature', function (err, msg) {
                 if (msg.status === '2.05') {
-                    should(msg.data).be.eql(result);
+                    expect(msg.data).to.be.eql(result);
                     done();
                 }
             });
@@ -333,7 +330,7 @@ describe('coap-node device-managment test', function() {
     describe('coap-shepherd tries to writeAttrs', function() {
         it('writeAttrs - resource', function (done) {
             var attrs = {
-                pmin: 10,
+                pmin: 5,
                 pmax: 90,
                 gt: 0,
                 lt: 100,
@@ -410,10 +407,27 @@ describe('coap-node device-managment test', function() {
 
     describe('coap-shepherd tries to observe', function() {
         it('observe - resource', function (done) {
-            remoteNode.observeReq('/temperature/0/5702', function (err, msg) {
+            var devNotifyHdlr = function (msg) {
+                    switch(msg.type) {
+                        case 'notify':
+                            if (msg.data.device === 'utNode') {
+                                expect(msg.data.path).to.be.eql('/temperature/0/units');
+                                expect(msg.data.value).to.be.eql('F');
+                                shepherd.removeListener('ind', devNotifyHdlr);
+                                done(); 
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                };
+
+            shepherd.on('ind', devNotifyHdlr);
+
+            remoteNode.observeReq('/temperature/0/units', function (err, msg) {
                 if (msg.status === '2.05') {
-                    should(msg.data).be.eql('2016/03/18');
-                    done();
+                    expect(msg.data).to.be.eql('C');
+                    remoteNode.writeReq('/temperature/0/units', 'F', function (err, msg) {});
                 }
             });
         });
@@ -435,7 +449,7 @@ describe('coap-node device-managment test', function() {
         });
 
         it('observe - resource is observed', function (done) {
-            remoteNode.observeReq('/temperature/0/5702', function (err, msg) {
+            remoteNode.observeReq('/temperature/0/units', function (err, msg) {
                 if (msg.status === '2.00') {
                     done();
                 }
@@ -445,16 +459,39 @@ describe('coap-node device-managment test', function() {
         it('observe - instence', function (done) {
             var reqObj = {
                     sensorValue: 21,
-                    units: 'C',
+                    units: 'F',
+                    5702: '2016/03/18',
+                    5703: '_unreadable_',
+                    5704: '_exec_'
+                },
+                reqObj2 = {
+                    sensorValue: 22,
+                    units: 'F',
                     5702: '2016/03/18',
                     5703: '_unreadable_',
                     5704: '_exec_'
                 };
 
+            var devNotifyHdlr = function (msg) {
+                    switch(msg.type) {
+                        case 'notify':
+                            if (msg.data.path === '/temperature/0') {
+                                expect(msg.data.value).to.be.eql(reqObj2);
+                                shepherd.removeListener('ind', devNotifyHdlr);
+                                done(); 
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                };
+
+            shepherd.on('ind', devNotifyHdlr);
+
             remoteNode.observeReq('/temperature/0', function (err, msg) {
                 if (msg.status === '2.05') {
-                    should(msg.data).be.eql(reqObj);
-                    done();
+                    expect(msg.data).to.be.eql(reqObj);
+                    remoteNode.writeReq('/temperature/0/sensorValue', 22, function (err, msg) {});
                 }
             });
         });
@@ -475,7 +512,7 @@ describe('coap-node device-managment test', function() {
 
     describe('coap-shepherd tries to cancelObserve', function() {
         it('cancelObserve - resource', function (done) {
-            remoteNode.cancelObserveReq('/temperature/0/5702', function (err, msg) {
+            remoteNode.cancelObserveReq('/temperature/0/units', function (err, msg) {
                 if (msg.status === '2.05') done();
             });
         });

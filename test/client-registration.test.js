@@ -1,4 +1,4 @@
-var should = require('should'),
+var expect = require('chai').expect,
     _ = require('busyman'),
     shepherd = require('coap-shepherd');
 
@@ -50,7 +50,7 @@ describe('coap-node registration test', function() {
                 var cn;
                 if (msg.status === '2.01' || msg.status === '2.04') {
                     cn = shepherd.find('utNode');
-                    should(cn._registered).be.eql(true);
+                    expect(cn._registered).to.be.eql(true);
                 }
             });
         });
@@ -72,24 +72,39 @@ describe('coap-node registration test', function() {
             shepherd.on('ind', devRegHdlr);
 
             node.register('127.0.0.1', 5683, function (err, msg) {
-                should(msg.status).be.eql('2.04');
+                expect(msg.status).to.be.eql('2.04');
             });
         });
     });
 
     describe('coap-node tries to setDevAttrs', function() {
         it('setDevAttrs - update', function (done) {
+            var devUpdateHdlr = function (msg) {
+                switch(msg.type) {
+                    case 'update':
+                        if (msg.data.device === 'utNode') {
+                            expect(msg.data.lifetime).to.be.eql(60000);
+                            shepherd.removeListener('ind', devUpdateHdlr);
+                            done(); 
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            };
+
+            shepherd.on('ind', devUpdateHdlr);
+
             node.setDevAttrs({ lifetime: 60000 }, function (err, msg) {
                 if (msg.status === '2.04') {
-                    node.lifetime.should.be.eql(60000);
-                    done();
+                    expect(node.lifetime).to.be.eql(60000);
                 }
             });
         });
 
-        it('setDevAttrs - no change', function (done) {
+        it('setDevAttrs - change port', function (done) {
             node.setDevAttrs({}, function (err, msg) {
-                if (msg.status === '2.00') {
+                if (msg.status === '2.04') {
                     done();
                 }
             });
@@ -106,12 +121,26 @@ describe('coap-node registration test', function() {
 
     describe('coap-node tries to deregister', function() {
         it('deregister - deregister', function (done) {
+            var devDeregHdlr = function (msg) {
+                switch(msg.type) {
+                    case 'deregistered':
+                        if (msg.data === 'utNode') {
+                            shepherd.removeListener('ind', devDeregHdlr);
+                            done(); 
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            };
+
+            shepherd.on('ind', devDeregHdlr);
+
             node.deregister(function (err, msg) {
                 var cn;
                 if (msg.status === '2.02') {
                     cn = shepherd.find('utNode');
-                    should(cn).be.undefined();
-                    done();
+                    expect(cn).to.be.eql(undefined);
                 }
             });
         });
