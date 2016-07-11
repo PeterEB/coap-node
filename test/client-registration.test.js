@@ -1,5 +1,6 @@
 var expect = require('chai').expect,
     _ = require('busyman'),
+    fs = require('fs'),
     shepherd = require('coap-shepherd');
 
 var CoapNode = require('../lib/coap-node');
@@ -16,8 +17,15 @@ node.on('error', function (err) {
 
 describe('coap-node registration test', function() {
     this.timeout(15000);
-    
+
     describe('start connection test', function() {
+        it('reset database', function (done) {
+            var dbPath = '../lib/database/coap.db';
+            fs.exists(dbPath, function (isThere) {
+                if (isThere) { fs.unlink(dbPath); }
+                done();
+            });
+        });
 
         it('start - shepherd', function (done) {
             shepherd.start(function () {
@@ -126,6 +134,7 @@ describe('coap-node registration test', function() {
                     case 'deregistered':
                         if (msg.data === 'utNode') {
                             shepherd.removeListener('ind', devDeregHdlr);
+                            console.log(shepherd._registry);
                             done(); 
                         }
                         break;
@@ -147,6 +156,7 @@ describe('coap-node registration test', function() {
 
         it('deregister - deregister again', function (done) {
             node.deregister(function (err, msg) {
+                console.log(msg);
                 if (msg.status === '4.04') {
                     done();
                 }

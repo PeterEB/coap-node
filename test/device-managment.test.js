@@ -1,5 +1,6 @@
 var expect = require('chai').expect,
     _ = require('busyman'),
+    fs = require('fs'),
     shepherd = require('coap-shepherd');
 
 var CoapNode = require('../lib/coap-node');
@@ -41,7 +42,7 @@ node.on('error', function (err) {
 
 describe('coap-node device-managment test', function() {
     this.timeout(15000);
-    
+
     describe('coap-node tries to init resource', function() {
         it('initResrc - initResrc', function () {
             node.initResrc('temperature', 0, iObj);
@@ -62,6 +63,14 @@ describe('coap-node device-managment test', function() {
     });
 
     describe('start connection test', function() {
+        it('reset database', function (done) {
+            var dbPath = '../lib/database/coap.db';
+            fs.exists(dbPath, function (isThere) {
+                if (isThere) { fs.unlink(dbPath); }
+                done();
+            });
+        });
+
         it('start - shepherd', function (done) {
             shepherd.start(function () {
                 done();
@@ -76,6 +85,8 @@ describe('coap-node device-managment test', function() {
                         case 'registered':
                             if (msg.data.clientName === 'utNode') {
                                 shepherd.removeListener('ind', devRegHdlr);
+                                remoteNode = shepherd.find('utNode');
+                                expect(remoteNode._registered).to.be.true;
                                 done(); 
                             }
                             break;
@@ -86,12 +97,7 @@ describe('coap-node device-managment test', function() {
 
             shepherd.on('ind', devRegHdlr);
 
-            node.register('127.0.0.1', 5683, function (err, msg) {
-                if (msg.status === '2.01' || msg.status === '2.04') {
-                    remoteNode = shepherd.find('utNode');
-                    expect(remoteNode._registered).to.be.true;
-                }
-            });
+            node.register('127.0.0.1', 5683, function (err, msg) {});
         });
     });
 
@@ -116,6 +122,7 @@ describe('coap-node device-managment test', function() {
 
         it('read - resource is exec', function (done) {
             remoteNode.readReq('/temperature/0/5704', function (err, msg) {
+                console.log(msg);
                 if (msg.status === '4.05') {
                     expect(msg.data).to.be.eql('_exec_');
                     done();

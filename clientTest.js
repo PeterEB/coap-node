@@ -15,7 +15,8 @@ coapNode.on('updated', function (msg) {
 });
 
 coapNode.on('error', function (err) {
-    console.log('error: ' + err);
+    throw err
+    // console.log('error: ' + err);
 });
 
 coapNode.initResrc(3303, 0, {
