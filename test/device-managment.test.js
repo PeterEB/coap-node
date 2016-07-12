@@ -122,7 +122,6 @@ describe('coap-node device-managment test', function() {
 
         it('read - resource is exec', function (done) {
             remoteNode.readReq('/temperature/0/5704', function (err, msg) {
-                console.log(msg);
                 if (msg.status === '4.05') {
                     expect(msg.data).to.be.eql('_exec_');
                     done();

@@ -130,11 +130,14 @@ describe('coap-node registration test', function() {
     describe('coap-node tries to deregister', function() {
         it('deregister - deregister', function (done) {
             var devDeregHdlr = function (msg) {
+                var cn;
+
                 switch(msg.type) {
                     case 'deregistered':
                         if (msg.data === 'utNode') {
                             shepherd.removeListener('ind', devDeregHdlr);
-                            console.log(shepherd._registry);
+                            cn = shepherd.find('utNode');
+                            expect(cn).to.be.eql(undefined);
                             done(); 
                         }
                         break;
@@ -145,18 +148,11 @@ describe('coap-node registration test', function() {
 
             shepherd.on('ind', devDeregHdlr);
 
-            node.deregister(function (err, msg) {
-                var cn;
-                if (msg.status === '2.02') {
-                    cn = shepherd.find('utNode');
-                    expect(cn).to.be.eql(undefined);
-                }
-            });
+            node.deregister(function (err, msg) {});
         });
 
         it('deregister - deregister again', function (done) {
             node.deregister(function (err, msg) {
-                console.log(msg);
                 if (msg.status === '4.04') {
                     done();
                 }
