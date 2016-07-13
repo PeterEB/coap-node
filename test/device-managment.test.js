@@ -1,13 +1,14 @@
 var expect = require('chai').expect,
     _ = require('busyman'),
     fs = require('fs'),
+    SmartObject = require('smartobject'),
     shepherd = require('coap-shepherd');
 
 var CoapNode = require('../lib/coap-node');
 
-var node = new CoapNode('utNode');
-
-var remoteNode;
+var node = new CoapNode('utNode'),
+    smartObj = new SmartObject(),
+    remoteNode;
 
 var iObj = {
     sensorValue: 21,
@@ -45,20 +46,21 @@ describe('coap-node device-managment test', function() {
 
     describe('coap-node tries to init resource', function() {
         it('initResrc - initResrc', function () {
+            smartObj.init('temperature', 0, iObj);
             node.initResrc('temperature', 0, iObj);
-            expect(node.so.temperature[0]).to.be.eql(iObj);
+            expect(node.so.findObjectInstance('temperature', 0)).to.be.eql(smartObj.findObjectInstance('temperature', 0));
         });
 
         it('initResrc - wrong oid', function () {
-            expect(function () { return node.initResrc([], 0, iObj); }).to.throw(Error);
-            expect(function () { return node.initResrc({}, 0, iObj); }).to.throw(Error);
+            expect(function () { return node.initResrc([], 1, iObj); }).to.throw(Error);
+            expect(function () { return node.initResrc({}, 1, iObj); }).to.throw(Error);
         });
 
         it('initResrc - wrong resrc', function () {
-            expect(function () { return node.initResrc('temperature', 0, 'x'); }).to.throw(Error);
-            expect(function () { return node.initResrc('temperature', 0, 1); }).to.throw(Error);
-            expect(function () { return node.initResrc('temperature', 0, []); }).to.throw(Error);
-            expect(function () { return node.initResrc('temperature', 0, function () {}); }).to.throw(Error);
+            expect(function () { return node.initResrc('temperature', 1, 'x'); }).to.throw(Error);
+            expect(function () { return node.initResrc('temperature', 1, 1); }).to.throw(Error);
+            expect(function () { return node.initResrc('temperature', 1, []); }).to.throw(Error);
+            expect(function () { return node.initResrc('temperature', 1, function () {}); }).to.throw(Error);
         });
     });
 
