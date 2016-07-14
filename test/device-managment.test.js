@@ -6,10 +6,7 @@ var expect = require('chai').expect,
 
 var CoapNode = require('../lib/coap-node');
 
-var node = new CoapNode('utNode'),
-    smartObj = new SmartObject(),
-    remoteNode;
-
+var so = new SmartObject();
 var iObj = {
     sensorValue: 21,
     units: 'C',
@@ -33,6 +30,11 @@ var iObj = {
     }
 };
 
+so.init('temperature', 0, iObj);
+
+var node = new CoapNode('utNode', so),
+    remoteNode;
+
 shepherd.on('error', function (err) {
     console.log(err);
 });
@@ -43,26 +45,6 @@ node.on('error', function (err) {
 
 describe('coap-node device-managment test', function() {
     this.timeout(15000);
-
-    describe('coap-node tries to init resource', function() {
-        it('initResrc - initResrc', function () {
-            smartObj.init('temperature', 0, iObj);
-            node.initResrc('temperature', 0, iObj);
-            expect(node.so.findObjectInstance('temperature', 0)).to.be.eql(smartObj.findObjectInstance('temperature', 0));
-        });
-
-        it('initResrc - wrong oid', function () {
-            expect(function () { return node.initResrc([], 1, iObj); }).to.throw(Error);
-            expect(function () { return node.initResrc({}, 1, iObj); }).to.throw(Error);
-        });
-
-        it('initResrc - wrong resrc', function () {
-            expect(function () { return node.initResrc('temperature', 1, 'x'); }).to.throw(Error);
-            expect(function () { return node.initResrc('temperature', 1, 1); }).to.throw(Error);
-            expect(function () { return node.initResrc('temperature', 1, []); }).to.throw(Error);
-            expect(function () { return node.initResrc('temperature', 1, function () {}); }).to.throw(Error);
-        });
-    });
 
     describe('start connection test', function() {
         it('reset database', function (done) {
@@ -183,6 +165,7 @@ describe('coap-node device-managment test', function() {
 
         it('write - resource is unwriteable', function (done) {
             remoteNode.writeReq('/temperature/0/5702', 'x', function (err, msg) {
+                console.log(msg);
                 if (msg.status === '4.05') done();
             });
         });
@@ -254,6 +237,12 @@ describe('coap-node device-managment test', function() {
         //         if (msg.status === '2.04') done();
         //     });
         // });
+
+        it('execute - not allowed argus', function (done) {
+            remoteNode.executeReq('/temperature/0/5703', [ ' ' ], function (err, msg) {
+                if (msg.status === '4.00') done();
+            });
+        });
 
         it('execute - resource is unexecutable', function (done) {
             remoteNode.executeReq('/temperature/0/5702', function (err, msg) {

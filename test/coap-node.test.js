@@ -1,8 +1,11 @@
 var expect = require('chai').expect,
     _ = require('busyman'),
+    SmartObject = require('smartobject'),
     CoapNode = require('../lib/coap-node');
 
-var node = new CoapNode('utNode');
+var so = new SmartObject();
+
+var node = new CoapNode('utNode', so);
 
 describe('CoapNode Check', function () {
     it('Signature Check', function () {
@@ -17,7 +20,7 @@ describe('CoapNode Check', function () {
         expect(function () { return new CoapNode(new Date()); }).to.throw(TypeError);
         expect(function () { return new CoapNode(function () {}); }).to.throw(TypeError);
 
-        expect(function () { return new CoapNode('xxx'); }).not.to.throw(TypeError);
+        expect(function () { return new CoapNode('xxx', so); }).not.to.throw(TypeError);
     });
 
     it('Constructor Check', function () {

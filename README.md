@@ -52,21 +52,25 @@ coap-node
 Client-side example (the following example is how you use `coap-node` on a machine node):
 
 ```js
-var CoapNode = require('coap-node');
-var cnode = new CoapNode('my_first_node');
+var CoapNode = require('coap-node'),
+    SmartObject = require('smartobject');
+
+var so = new SmartObject;
 
 // initialize your Resources
 // oid = 'temperature', iid = 0
-cnode.initResrc('temperature', 0, {
+so.init('temperature', 0, {
     sensorValue: 21,
     units: 'C'
 });
 
 // oid = 'temperature', iid = 1
-cnode.initResrc('temperature', 1, {
+so.init('temperature', 1, {
     sensorValue: 70,
     units: 'F'
 });
+
+var cnode = new CoapNode('my_first_node', so);
 
 cnode.on('registered', function () {
     // If the registration procedure completes successfully, 'registered' will be fired
@@ -102,93 +106,15 @@ With **coap-node**, all you have to do is to plan your Resources well on the mac
 Use `initResrc(oid, iid, resrcs)` method to help you with initializing your Resources. A Resource value can be a  
 [primitive value](#Resource_simple), an [object with read() method](#Resource_readable), an [object with write() method](#Resource_writeable), an [object with read() and write() methods](#Resource_both), and an [object with exec() method.](#Resource_executable).  
 
-Here is the [tutorial about how to initialize your Resources](https://github.com/PeterEB/coap-node/blob/develop/docs/rsc_plan.md) on the client node. Here, I'm showing you some quick examples:  
+Here is the [tutorial about how to initialize your Resources](https://github.com/PeterEB/coap-node/blob/develop/docs/rsc_plan.md) on the client node. Here, I'm showing you some quick examples: 
 
-<a name="Resource_simple"></a>
-#### (1) Initialize a Resource as a primitive value
-
-```js
-cnode.initResrc('temperature', 0, {
-    sensorValue: 21,    // Resource value is a number 21
-    units: 'C'          // Resource value is a string 'C'
-});
-```
-
-<a name="Resource_readable"></a>
-#### (2) Initialize a Resource with read method
-
-```js
-cnode.initResrc('temperature', 0, {
-    sensorValue: {
-        read: function (cb) {
-            var tempVal = gpio.read('gpio0');
-            cb(null, tempVal);  // pass the read value, tempVal, to the callback cb
-        }
-    },
-    units: 'C'
-});
-```
-
-<a name="Resource_writeable"></a>
-#### (3) Initialize a Resource with write method
-
-```js
-cnode.initResrc('lightCtrl', 0, {
-    onOff: {
-        write: function (val, cb) {
-            gpio.write('led0', val);
-            cb(null, val);
-        }
-    },
-});
-```
-
-<a name="Resource_both"></a>
-#### (4) Initialize a Resource with read and write methods
-
-```js
-cnode.initResrc('lightCtrl', 0, {
-    onOff: {
-        read: function (cb) {
-            var val = gpio.read('led0');
-            cb(null, val);
-        },
-        write: function (val, cb) {
-            gpio.write('led0', val);
-            cb(null, val);
-        }
-    },
-});
-```
-
-<a name="Resource_executable"></a>
-#### (5) Initialize a Resource with exec method
-
-```js
-function blinkLed(led, times) {
-    // blink an led
-}
-
-cnode.initResrc('led', 0, {
-    blink: {
-        exec: function (t, cb) {
-            if (typeof t !== 'number') {
-                cb('4.00');  
-            } else {
-                blinkLed('led0', t);    // blink a led with t times
-                cb(null);               // or cb('2.04');
-            }
-        }
-    },
-});
-```
+[TBD] 
 
 <a name="APIs"></a>
 ## 6. APIs and Events
 
 * [new CoapNode()](#API_CoapNode)
 * [setDevAttrs()](#API_setDevAttrs)
-* [initResrc()](#API_initResrc)
 * [readResrc()](#API_readResrc)
 * [writeResrc()](#API_writeResrc)
 * [register()](#API_register)
@@ -271,86 +197,6 @@ cnode.setDevAttrs({ lifetime: 12000 }, function (err, rsp) {
 });
 ```
 
-*************************************************
-<a name="API_initResrc"></a>
-### initResrc(oid, iid, resrcs)
-Initialize the Resources on cnode.  
-
-**Arguments:**  
-
-1. `oid` (_String_ | _Number_): Id of the Object that owns the Resources.  
-2. `iid` (_String_ | _Number_): Id of the Object Instance that owns the Resources. It's common to use a number as `iid`, but using a string is also accepted.  
-3. `resrcs` (_Object_): An object with **rid-value pairs** to describe the Resources. Each Resource is something that could be read, written, or executed remotely by a Server.  
-
-**Note**: 
-Please refer to [lwm2m-id](https://github.com/simenkid/lwm2m-id#5-table-of-identifiers) for all pre-defined IPSO/OMA-LWM2M identifiers. If the `oid` or `rid` is not a pre-defined id, **coap-node** will regard it as a private one.  
-
-**Returns:**  
-
-* (none)
-
-**Examples:** 
-
-* Resource is a simple value:
-
-```js
-// use oid and rids in string
-cnode.initResrc('temperature', 1, {
-    sensorValue: 70,
-    units: 'F'
-});
-
-// use oid and rids in number
-cnode.initResrc(3303, 1, {
-    5700: 70,
-    5701: 'F'
-});
-
-// oid and rids in string-numbers
-cnode.initResrc('3303', 1, {
-    '5700': 70,
-    '5701': 'F'
-});
-```
-
-* Resource value is read from particular operations:
-
-```js
-cnode.initResrc('dIn', 0, {
-    dInState: {
-        read: function (cb) {
-            var val = gpio.read('gpio0');
-            cb(null, val);
-        }
-    },
-});
-```
-
-* Resource value should be written through particular operations:
-
-```js
-cnode.initResrc('dOut', 0, {
-    dOutState: {
-        write: function (val, cb) {
-            gpio.write('gpio0', val);
-            cb(null, val);
-        }
-    },
-});
-```
-
-* Resource is an executable procedure that can be called remotely:
-
-```js
-cnode.initResrc('led', 0, {
-    blink: {
-        exec: function (t, cb) {
-            blinkLed('led0', t);    // bink led0 for t times
-            cb(null);               // cb(status), give `status` with 'null' or '2.04' if the operation succeeds.
-        }
-    },
-});
-```
 *************************************************
 <a name="API_readResrc"></a>
 ### readResrc(oid, iid, rid[, callback])
@@ -539,7 +385,7 @@ The following example shows how to create an **digital input** Object Instance. 
 ```js
 // Create an Object Instance: Digital Input (oid = 3200 or 'dIn')
 
-cnode.initResrc('dIn', 0, {
+so.init('dIn', 0, {
     dInState: {                     // < rid = 5500, R, Boolean >
         read: function (cb) {}
     },

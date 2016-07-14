@@ -31,7 +31,7 @@ This document provides you with code templates of many IPSO-defined devices [(Sm
   
 ```js
 // 01. Digital Input (oid = 3200 or 'dIn')
-cnode.initResrc('dIn', 0, {
+so.init('dIn', 0, {
     dInState: {                     // < rid = 5500, R, Boolean >
         read: function (cb) {}
     },
@@ -51,7 +51,7 @@ cnode.initResrc('dIn', 0, {
   
 ```js
 // 02. Digital Output (oid = 3201 or 'dOut')
-cnode.initResrc('dOut', 0, {
+so.init('dOut', 0, {
     dOutState: {                    // < rid = 5550, RW, Boolean >
         read: function (cb) {},
         write: function (cb) {}
@@ -67,7 +67,7 @@ cnode.initResrc('dOut', 0, {
   
 ```js
 // 03. Analog Input (oid = 3202 or 'aIn')
-cnode.initResrc('aIn', 0, {
+so.init('aIn', 0, {
     aInCurrValue: {                 // < rid = 5600, R, Float >
         read: function (cb) {}
     },
@@ -87,7 +87,7 @@ cnode.initResrc('aIn', 0, {
   
 ```js
 // 04. Analog Output (oid = 3203 or 'aOut')
-cnode.initResrc('aOut', 0, {
+so.init('aOut', 0, {
     aOutCurrValue: {                // < rid = 5650, RW, Float >
         read: function (cb) {},
         write: function (cb) {}
@@ -104,7 +104,7 @@ cnode.initResrc('aOut', 0, {
   
 ```js
 // 05. Generic Sensor (oid = 3300 or 'generic')
-cnode.initResrc('generic', 0, {
+so.init('generic', 0, {
     sensorValue: {                  // < rid = 5700, R, Float >
         read: function (cb) {}
     },
@@ -125,7 +125,7 @@ cnode.initResrc('generic', 0, {
   
 ```js
 // 06. Illuminance Sensor (oid = 3301 or 'illuminance')
-cnode.initResrc('illuminance', 0, {
+so.init('illuminance', 0, {
     sensorValue: {                  // < rid = 5700, R, Float >
         read: function (cb) {}
     },
@@ -144,7 +144,7 @@ cnode.initResrc('illuminance', 0, {
   
 ```js
 // 07. Presence Sensor (oid = 3302 or 'presence')
-cnode.initResrc('presence', 0, {
+so.init('presence', 0, {
     dInState: {                     // < rid = 5500, R, Boolean >
         read: function (cb) {}
     },
@@ -162,7 +162,7 @@ cnode.initResrc('presence', 0, {
   
 ```js
 // 08. Temperature Sensor (oid = 3303 or 'temperature')
-cnode.initResrc('temperature', 0, {
+so.init('temperature', 0, {
     sensorValue: {                  // < rid = 5700, R, Float >
         read: function (cb) {}
     },
@@ -181,7 +181,7 @@ cnode.initResrc('temperature', 0, {
   
 ```js
 // 09. Humidity Sensor (oid = 3304 or 'humidity')
-cnode.initResrc('humidity', 0, {
+so.init('humidity', 0, {
     sensorValue: {                  // < rid = 5700, R, Float >
         read: function (cb) {}
     },
@@ -200,7 +200,7 @@ cnode.initResrc('humidity', 0, {
   
 ```js
 // 10. Power Measurement (oid = 3305 or 'pwrMea')
-cnode.initResrc('pwrMea', 0, {
+so.init('pwrMea', 0, {
     instActivePwr: {                // < rid = 5800, R, Float, Wh >
         read: function (cb) {}
     },
@@ -230,7 +230,7 @@ cnode.initResrc('pwrMea', 0, {
   
 ```js
 // 11. Actuation (oid = 3306 or 'actuation')
-cnode.initResrc('actuation', 0, {
+so.init('actuation', 0, {
     onOff: {                        // < rid = 5850, RW, Boolean { 0: off, 1: on } >
         read: function (cb) {},
         write: function (cb) {}
@@ -248,7 +248,7 @@ cnode.initResrc('actuation', 0, {
   
 ```js
 // 12. Set Point (oid = 3308 or 'setPoint')
-cnode.initResrc('setPoint', 0, {
+so.init('setPoint', 0, {
     setPointValue: {                // < rid = 5900, RW, Float >
         read: function (cb) {},
         write: function (cb) {}
@@ -265,7 +265,7 @@ cnode.initResrc('setPoint', 0, {
   
 ```js
 // 13. Load Control (oid = 3310 or 'loadCtrl')
-cnode.initResrc('loadCtrl', 0, {
+so.init('loadCtrl', 0, {
     eventId: {                      // < rid = 5823, RW, String >
         read: function (cb) {},
         write: function (cb) {}
@@ -290,7 +290,7 @@ cnode.initResrc('loadCtrl', 0, {
   
 ```js
 // 14. Light Control (oid = 3311 or 'lightCtrl')
-cnode.initResrc('lightCtrl', 0, {
+so.init('lightCtrl', 0, {
     onOff: {                        // < rid = 5850, RW, Boolean { 0: off, 1: on } >
         read: function (cb) {},
         write: function (cb) {}
@@ -310,7 +310,7 @@ cnode.initResrc('lightCtrl', 0, {
   
 ```js
 // 15. Power Control (oid = 3312 or 'pwrCtrl')
-cnode.initResrc('pwrCtrl', 0, {
+so.init('pwrCtrl', 0, {
     onOff: {                        // < rid = 5850, RW, Boolean { 0: off, 1: on } >
         read: function (cb) {},
         write: function (cb) {}
@@ -328,7 +328,7 @@ cnode.initResrc('pwrCtrl', 0, {
 
 ```js
 // 16. Accelerometer (oid = 3313 or 'accelerometer')
-cnode.initResrc('accelerometer', 0, {
+so.init('accelerometer', 0, {
     xValue: {                       // < rid = 5702, R, Float >
         read: function (cb) {}
     },
@@ -346,7 +346,7 @@ cnode.initResrc('accelerometer', 0, {
   
 ```js
 // 17. Magnetometer (oid = 3314 or 'magnetometer')
-cnode.initResrc('magnetometer', 0, {
+so.init('magnetometer', 0, {
     xValue: {                       // < rid = 5702, R, Float >
         read: function (cb) {}
     },
@@ -363,7 +363,7 @@ cnode.initResrc('magnetometer', 0, {
   
 ```js
 // 18. Barometer (oid = 3315 or 'barometer')
-cnode.initResrc('barometer', 0, {
+so.init('barometer', 0, {
     sensorValue: {                  // < rid = 5700, R, Float >
         read: function (cb) {}
     },

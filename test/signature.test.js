@@ -1,9 +1,11 @@
 var expect = require('chai').expect,
+    SmartObject = require('smartobject'),
     CoapNode = require('../index.js'); 
 
 var CoapNode = require('../lib/coap-node');
 
-var node = new CoapNode('utNode');
+var so = new SmartObject(),
+    node = new CoapNode('utNode', so);
 
 describe('Signature Check', function () {
     describe('setDevAttrs', function () {

@@ -1,11 +1,14 @@
 var expect = require('chai').expect,
     _ = require('busyman'),
     fs = require('fs'),
+    SmartObject = require('smartobject'),
     shepherd = require('coap-shepherd');
 
 var CoapNode = require('../lib/coap-node');
 
-var node = new CoapNode('utNode');
+var so = new SmartObject();
+
+var node = new CoapNode('utNode', so);
 
 shepherd.on('error', function (err) {
     console.log(err);
