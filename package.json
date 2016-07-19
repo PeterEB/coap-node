@@ -12,7 +12,7 @@
   },
   "devDependencies": {
     "chai": "^3.5.0",
-    "coap-shepherd": "^0.1.1",
+    "coap-shepherd": "^0.1.2",
     "mocha": "^2.5.3"
   },
   "scripts": {
