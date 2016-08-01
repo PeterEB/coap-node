@@ -1,8 +1,7 @@
 var expect = require('chai').expect,
-    SmartObject = require('smartobject'),
-    CoapNode = require('../index.js'); 
+    SmartObject = require('smartobject'); 
 
-var CoapNode = require('../lib/coap-node');
+var CoapNode = require('../index');
 
 var so = new SmartObject(),
     node = new CoapNode('utNode', so);

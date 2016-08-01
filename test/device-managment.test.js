@@ -1,10 +1,11 @@
-var expect = require('chai').expect,
+var fs = require('fs'),
+    path = require('path'),
     _ = require('busyman'),
-    fs = require('fs'),
+    expect = require('chai').expect,
     SmartObject = require('smartobject'),
     shepherd = require('coap-shepherd');
 
-var CoapNode = require('../lib/coap-node');
+var CoapNode = require('../index');
 
 var so = new SmartObject();
 var iObj = {
@@ -44,17 +45,9 @@ node.on('error', function (err) {
 });
 
 describe('coap-node device-managment test', function() {
-    this.timeout(15000);
+    this.timeout(5000);
 
     describe('start connection test', function() {
-        it('reset database', function (done) {
-            var dbPath = '../lib/database/coap.db';
-            fs.exists(dbPath, function (isThere) {
-                if (isThere) { fs.unlink(dbPath); }
-                done();
-            });
-        });
-
         it('start - shepherd', function (done) {
             shepherd.start(function () {
                 done();
@@ -88,7 +81,9 @@ describe('coap-node device-managment test', function() {
     describe('coap-shepherd tries to read', function() {
         it('read - resource', function (done) {
             remoteNode.readReq('/temperature/0/sensorValue', function (err, msg) {
-                if (msg.status === '2.05') {
+                if (err) { 
+                    console.log(err);
+                } else if (msg.status === '2.05') {
                     expect(msg.data).to.be.eql(21);
                     done();
                 }
@@ -97,7 +92,9 @@ describe('coap-node device-managment test', function() {
 
         it('read - resource is unreadable', function (done) {
             remoteNode.readReq('/temperature/0/5703', function (err, msg) {
-                if (msg.status === '4.05') {
+                if (err) { 
+                    console.log(err);
+                } else if (msg.status === '4.05') {
                     expect(msg.data).to.be.eql('_unreadable_');
                     done();
                 }
@@ -106,7 +103,9 @@ describe('coap-node device-managment test', function() {
 
         it('read - resource is exec', function (done) {
             remoteNode.readReq('/temperature/0/5704', function (err, msg) {
-                if (msg.status === '4.05') {
+                if (err) { 
+                    console.log(err);
+                } else if (msg.status === '4.05') {
                     expect(msg.data).to.be.eql('_exec_');
                     done();
                 }
@@ -123,7 +122,9 @@ describe('coap-node device-managment test', function() {
                         5704: '_exec_'
                     };
 
-                if (msg.status === '2.05') {
+                if (err) { 
+                    console.log(err);
+                } else if (msg.status === '2.05') {
                     expect(msg.data).to.be.eql(inst);
                     done();
                 }
@@ -142,7 +143,9 @@ describe('coap-node device-managment test', function() {
                         }
                     };
 
-                if (msg.status === '2.05') {
+                if (err) { 
+                    console.log(err);
+                } else if (msg.status === '2.05') {
                     expect(msg.data).to.be.eql(obj);
                     done();
                 }
@@ -159,20 +162,25 @@ describe('coap-node device-managment test', function() {
     describe('coap-shepherd tries to write', function() {
         it('write - resource', function (done) {
             remoteNode.writeReq('/temperature/0/sensorValue', 19, function (err, msg) {
-                if (msg.status === '2.04') done();
+                if (err) { 
+                    console.log(err);
+                } else if (msg.status === '2.04') done();
             });
         });
 
         it('write - resource is unwriteable', function (done) {
             remoteNode.writeReq('/temperature/0/5702', 'x', function (err, msg) {
-                console.log(msg);
-                if (msg.status === '4.05') done();
+                if (err) { 
+                    console.log(err);
+                } else if (msg.status === '4.05') done();
             });
         });
 
         it('write - resource is exec', function (done) {
             remoteNode.writeReq('/temperature/0/5704', 'x', function (err, msg) {
-                if (msg.status === '4.05') done();
+                if (err) { 
+                    console.log(err);
+                } else if (msg.status === '4.05') done();
             });
         });
 
@@ -184,7 +192,9 @@ describe('coap-node device-managment test', function() {
                 };
 
             remoteNode.writeReq('/temperature/0', inst, function (err, msg) {
-                if (msg.status === '2.04') done();
+                if (err) { 
+                    console.log(err);
+                } else if (msg.status === '2.04') done();
             });
         });
 
@@ -198,7 +208,9 @@ describe('coap-node device-managment test', function() {
                 };
 
             remoteNode.writeReq('/temperature/0', inst, function (err, msg) {
-                if (msg.status === '4.05') done();
+                if (err) { 
+                    console.log(err);
+                } else if (msg.status === '4.05') done();
             });
         });
 
@@ -228,7 +240,9 @@ describe('coap-node device-managment test', function() {
     describe('coap-shepherd tries to execute', function() {
         it('execute - resource with argus', function (done) {
             remoteNode.executeReq('/temperature/0/5704', ['peter', 'world'], function (err, msg) {
-                if (msg.status === '2.04') done();
+                if (err) { 
+                    console.log(err);
+                } else if (msg.status === '2.04') done();
             });
         });
 
@@ -240,13 +254,17 @@ describe('coap-node device-managment test', function() {
 
         it('execute - not allowed argus', function (done) {
             remoteNode.executeReq('/temperature/0/5703', [ ' ' ], function (err, msg) {
-                if (msg.status === '4.00') done();
+                if (err) { 
+                    console.log(err);
+                } else if (msg.status === '4.00') done();
             });
         });
 
         it('execute - resource is unexecutable', function (done) {
             remoteNode.executeReq('/temperature/0/5702', function (err, msg) {
-                if (msg.status === '4.05') done();
+                if (err) { 
+                    console.log(err);
+                } else if (msg.status === '4.05') done();
             });
         });
 
@@ -282,7 +300,9 @@ describe('coap-node device-managment test', function() {
                 };
 
             remoteNode.discoverReq('/temperature/0/sensorValue', function (err, msg) {
-                if (msg.status === '2.05') {
+                if (err) { 
+                    console.log(err);
+                } else if (msg.status === '2.05') {
                     expect(msg.data).to.be.eql(result);
                     done();
                 }
@@ -296,7 +316,9 @@ describe('coap-node device-managment test', function() {
                 };
             
             remoteNode.discoverReq('/temperature/0', function (err, msg) {
-                if (msg.status === '2.05') {
+                if (err) { 
+                    console.log(err);
+                } else if (msg.status === '2.05') {
                     expect(msg.data).to.be.eql(result);
                     done();
                 }
@@ -310,7 +332,9 @@ describe('coap-node device-managment test', function() {
                 };
             
             remoteNode.discoverReq('/temperature', function (err, msg) {
-                if (msg.status === '2.05') {
+                if (err) { 
+                    console.log(err);
+                } else if (msg.status === '2.05') {
                     expect(msg.data).to.be.eql(result);
                     done();
                 }
@@ -335,7 +359,9 @@ describe('coap-node device-managment test', function() {
             };
 
             remoteNode.writeAttrsReq('/temperature/0/sensorValue', attrs, function (err, msg) {
-                if (msg.status === '2.04') done();
+                if (err) { 
+                    console.log(err);
+                } else if (msg.status === '2.04') done();
             });
         });
 
@@ -349,7 +375,9 @@ describe('coap-node device-managment test', function() {
             };
                     
             remoteNode.writeAttrsReq('/temperature/0', attrs, function (err, msg) {
-                if (msg.status === '2.04') done();
+                if (err) { 
+                    console.log(err);
+                } else if (msg.status === '2.04') done();
             });
         });
 
@@ -363,7 +391,9 @@ describe('coap-node device-managment test', function() {
             };
             
             remoteNode.writeAttrsReq('/temperature', attrs, function (err, msg) {
-                if (msg.status === '2.04') done();
+                if (err) { 
+                    console.log(err);
+                } else if (msg.status === '2.04') done();
             });
         });
 
@@ -422,7 +452,9 @@ describe('coap-node device-managment test', function() {
             shepherd.on('ind', devNotifyHdlr);
 
             remoteNode.observeReq('/temperature/0/units', function (err, msg) {
-                if (msg.status === '2.05') {
+                if (err) { 
+                    console.log(err);
+                } else if (msg.status === '2.05') {
                     expect(msg.data).to.be.eql('C');
                     remoteNode.writeReq('/temperature/0/units', 'F', function (err, msg) {});
                 }
@@ -431,7 +463,9 @@ describe('coap-node device-managment test', function() {
 
         it('observe - resource is unreadable', function (done) {
             remoteNode.observeReq('/temperature/0/5703', function (err, msg) {
-                if (msg.status === '4.05') {
+                if (err) { 
+                    console.log(err);
+                } else if (msg.status === '4.05') {
                     done();
                 }
             });
@@ -439,7 +473,9 @@ describe('coap-node device-managment test', function() {
 
         it('observe - resource is exec', function (done) {
             remoteNode.observeReq('/temperature/0/5704', function (err, msg) {
-                if (msg.status === '4.05') {
+                if (err) { 
+                    console.log(err);
+                } else if (msg.status === '4.05') {
                     done();
                 }
             });
@@ -447,7 +483,9 @@ describe('coap-node device-managment test', function() {
 
         it('observe - resource is observed', function (done) {
             remoteNode.observeReq('/temperature/0/units', function (err, msg) {
-                if (msg.status === '2.00') {
+                if (err) { 
+                    console.log(err);
+                } else if (msg.status === '2.00') {
                     done();
                 }
             });
@@ -486,7 +524,9 @@ describe('coap-node device-managment test', function() {
             shepherd.on('ind', devNotifyHdlr);
 
             remoteNode.observeReq('/temperature/0', function (err, msg) {
-                if (msg.status === '2.05') {
+                if (err) { 
+                    console.log(err);
+                } else if (msg.status === '2.05') {
                     expect(msg.data).to.be.eql(reqObj);
                     remoteNode.writeReq('/temperature/0/sensorValue', 22, function (err, msg) {});
                 }
@@ -495,7 +535,9 @@ describe('coap-node device-managment test', function() {
 
         it('observe - object', function (done) {
             remoteNode.observeReq('/temperature', function (err, msg) {
-                if (msg.status === '4.05') 
+                if (err) { 
+                    console.log(err);
+                } else if (msg.status === '4.05') 
                     done();
             });
         });
@@ -510,25 +552,33 @@ describe('coap-node device-managment test', function() {
     describe('coap-shepherd tries to cancelObserve', function() {
         it('cancelObserve - resource', function (done) {
             remoteNode.cancelObserveReq('/temperature/0/units', function (err, msg) {
-                if (msg.status === '2.05') done();
+                if (err) { 
+                    console.log(err);
+                } else if (msg.status === '2.05') done();
             });
         });
 
         it('cancelObserve - resource is not observed', function (done) {
             remoteNode.cancelObserveReq('/temperature/0/5703', function (err, msg) {
-                if (msg.status === '4.04') done();
+                if (err) { 
+                    console.log(err);
+                } else if (msg.status === '4.04') done();
             });
         });
 
         it('cancelObserve - instence', function (done) {
             remoteNode.cancelObserveReq('/temperature/0', function (err, msg) {
-                if (msg.status === '2.05') done();
+                if (err) { 
+                    console.log(err);
+                } else if (msg.status === '2.05') done();
             });
         });
 
         it('cancelObserve - object', function (done) {
             remoteNode.cancelObserveReq('/temperature', function (err, msg) {
-                if (msg.status === '4.05') done();
+                if (err) { 
+                    console.log(err);
+                } else if (msg.status === '4.05') done();
             });
         });
 
@@ -542,7 +592,9 @@ describe('coap-node device-managment test', function() {
     describe('stop', function() {
         it('deregister - node', function (done) {
             node.deregister(function (err, msg) {
-                if (msg.status === '2.02') {
+                if (err) { 
+                    console.log(err);
+                } else if (msg.status === '2.02') {
                     done();
                 }
             });

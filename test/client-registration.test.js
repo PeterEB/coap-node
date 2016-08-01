@@ -1,10 +1,11 @@
-var expect = require('chai').expect,
+var fs = require('fs'),
+    path = require('path'),
     _ = require('busyman'),
-    fs = require('fs'),
+    expect = require('chai').expect,
     SmartObject = require('smartobject'),
     shepherd = require('coap-shepherd');
 
-var CoapNode = require('../lib/coap-node');
+var CoapNode = require('../index');
 
 var so = new SmartObject();
 
@@ -18,18 +19,16 @@ node.on('error', function (err) {
     console.log(err);
 });
 
+try {
+    fs.unlinkSync(path.resolve('./node_modules/coap-shepherd/lib/database/coap.db'));
+} catch (e) {
+    console.log(e);
+}
+
 describe('coap-node registration test', function() {
     this.timeout(15000);
 
     describe('start connection test', function() {
-        it('reset database', function (done) {
-            var dbPath = '../lib/database/coap.db';
-            fs.exists(dbPath, function (isThere) {
-                if (isThere) { fs.unlink(dbPath); }
-                done();
-            });
-        });
-
         it('start - shepherd', function (done) {
             shepherd.start(function () {
                 done();

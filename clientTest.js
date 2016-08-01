@@ -1,25 +1,9 @@
-var CoapNode = require('./index.js');
+var CoapNode = require('./index.js'),
+    SmartObject = require('smartobject');
 
-var coapNode = new CoapNode('nodeTest');
+var so = new SmartObject();
 
-coapNode.on('registered', function () {
-    console.log('registered');
-});
-
-coapNode.on('deregistered', function (msg) {
-    console.log('deregistered');
-});
-
-coapNode.on('updated', function (msg) {
-    console.log('updated');
-});
-
-coapNode.on('error', function (err) {
-    throw err
-    // console.log('error: ' + err);
-});
-
-coapNode.initResrc(3303, 0, {
+so.init(3303, 0, {
     sensorValue: 21,
     units: 'C',
     5702: { 
@@ -41,20 +25,33 @@ coapNode.initResrc(3303, 0, {
     }
 });
 
-coapNode.initResrc(3303, 1, {
+so.init(3303, 1, {
     5700: 70,
     5701: 'F'
+});
+
+var coapNode = new CoapNode('nodeTest', so);
+
+coapNode.on('registered', function () {
+    console.log('registered');
+});
+
+coapNode.on('deregistered', function (msg) {
+    console.log('deregistered');
+});
+
+coapNode.on('updated', function (msg) {
+    console.log('updated');
+});
+
+coapNode.on('error', function (err) {
+    throw err;
+    // console.log('error: ' + err);
 });
 
 coapNode.register('127.0.0.1', 5683, function (err, rsp) {
     console.log(rsp);
 });
-
-setInterval(function () {
-    coapNode._dumpObj(3303, 0, function (err, rsp) {
-        console.log(rsp);
-    });
-}, 8000);
 
 // setTimeout(function () {
 //     coapNode.register('127.0.0.1', 5683, function (err, rsp) {

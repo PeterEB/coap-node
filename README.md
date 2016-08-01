@@ -12,9 +12,7 @@ coap-node
 2. [Features](#Features)  
 3. [Installation](#Installation)  
 4. [Usage](#Usage)  
-5. [Resources Planning](#Resources)  
-6. [APIs and Events](#APIs)  
-7. [Code Templates](#Templates)  
+5. [APIs and Events](#APIs)  
 
 
 <a name="Overview"></a>
@@ -22,7 +20,9 @@ coap-node
 
 [**OMA Lightweight M2M**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) (LWM2M) is a resource constrained device management protocol relies on [**CoAP**](https://tools.ietf.org/html/rfc7252). And **CoAP** is an application layer protocol that allows devices to communicate with each other RESTfully over the Internet.  
 
-**coap-node** is a module that aims to provide a simple way to build M2M/IoT client devices managed by a **coap-shepherd** server. This module follows [**IPSO**](http://www.ipso-alliance.org/smart-object-guidelines/) data model to well organize and define resources on a machine node. This document also provides [templates](#Templates) of many common devices defined by [IPSO Smart Objects starter pack 1.0](http://www.ipso-alliance.org/smart-object-guidelines/), i.e., temperature sensor, humidity sensor, light control. It is easy to add new Objects and Resources to fit your needs.  
+**coap-node** is a module that aims to provide a simple way to build M2M/IoT client devices managed by a **coap-shepherd** server. This module follows [**IPSO**](http://www.ipso-alliance.org/smart-object-guidelines/) data model to well organize and define resources on a machine node. 
+
+This module uses [smartobject](https://github.com/PeterEB/smartobject) as its fundamental of resource organizing on devices. **smartobject** can help you create smart objects with IPSO data model, and it also provides a scheme to help you abstract your hardware into smart objects. You may like to use **smartobject** to create many plugins for your own hardware or modules, i.e., temperature sensor, humidity sensor, light control.  
 
 ###Acronyms and Abbreviations
 
@@ -55,7 +55,11 @@ Client-side example (the following example is how you use `coap-node` on a machi
 var CoapNode = require('coap-node'),
     SmartObject = require('smartobject');
 
-var so = new SmartObject;
+/*********************************************/
+/*   Smart Object: Resources Initialzation   */
+/*********************************************/
+// initialize Resources that follow IPSO definition
+var so = new SmartObject();
 
 // initialize your Resources
 // oid = 'temperature', iid = 0
@@ -70,6 +74,10 @@ so.init('temperature', 1, {
     units: 'F'
 });
 
+/*********************************************/
+/*   Client Device Initialzation             */
+/*********************************************/
+// Instantiate a machine node with your smart object
 var cnode = new CoapNode('my_first_node', so);
 
 cnode.on('registered', function () {
@@ -98,25 +106,12 @@ cnode.write('/temperature/1/sensorValue', function (err, rsp) {
 });
 ```
 
-<a name="Resources"></a>
-## 5. Resources Planning
-
-With **coap-node**, all you have to do is to plan your Resources well on the machine. **coap-node** will automatically tackle the response things for you with respect to requests from a Server. **coap-node** is trying to lower down your effort of designing client nodes in a machine network.  
-
-Use `initResrc(oid, iid, resrcs)` method to help you with initializing your Resources. A Resource value can be a  
-[primitive value](#Resource_simple), an [object with read() method](#Resource_readable), an [object with write() method](#Resource_writeable), an [object with read() and write() methods](#Resource_both), and an [object with exec() method.](#Resource_executable).  
-
-Here is the [tutorial about how to initialize your Resources](https://github.com/PeterEB/coap-node/blob/develop/docs/rsc_plan.md) on the client node. Here, I'm showing you some quick examples: 
-
-[TBD] 
-
 <a name="APIs"></a>
-## 6. APIs and Events
+## 5. APIs and Events
 
 * [new CoapNode()](#API_CoapNode)
+* [getSmartObject()](#API_getSmartObject)
 * [setDevAttrs()](#API_setDevAttrs)
-* [readResrc()](#API_readResrc)
-* [writeResrc()](#API_writeResrc)
 * [register()](#API_register)
 * [deregister()](#API_deregister)
 * Events: [registered](#EVT_registered), [updated](#EVT_updated), [deregistered](#EVT_deregistered), [announce](#announce), and [error](#EVT_error)
@@ -125,16 +120,17 @@ Here is the [tutorial about how to initialize your Resources](https://github.com
 ## CoapNode Class
 Exposed by `require('coap-node')`.  
   
-An instance of this class is denoted as **cnode** in this document. Configurations of connection are read from the `config.js` file in the root folder of the module.  
+An instance of this class is denoted as **cnode** in this document. Configurations of connection are read from the `config.js` file in the `lib` folder of the module.  
 
 <a name="API_CoapNode"></a>
-### new CoapNode(clientName[, devAttrs])
+### new CoapNode(clientName, so[, devAttrs])
 Create a new instance of CoapNode class.
 
 **Arguments:**  
 
 1. `clientName` (_String_): Name of the Client Device, it should be unique in the network.  
-2. `devAttrs` (_Object_): Attributes of the Device. The following table shows the details of each property within devAttrs.  
+2. `so` (_Object_): An smart object that holds all Resources on the device. This object should be an instance of the [SmartObject](https://github.com/PeterEB/smartobject) class.
+3. `devAttrs` (_Object_): Attributes of the Device. The following table shows the details of each property within devAttrs.  
 
     |  Property  | Type   | Required | Description |
     |------------|--------|----------|-------------|
@@ -148,11 +144,43 @@ Create a new instance of CoapNode class.
 **Examples:** 
 
 ```js
-var CoapNode = require('coap-node');
+var CoapNode = require('coap-node'),
+    SmartObject = require('smartobject');
 
-var cnode = new CoapNode('foo_name');
+var so = new SmartObject();
+
+so.init('temperature', 0, {
+    sensorValue: 21,
+    units: 'C'
+});
+
+var cnode = new CoapNode('foo_name', so);
 ```
 
+*************************************************
+<a name="API_getSmartObject"></a>
+### getSmartObject()
+Get SmartObject on the cnode.  
+
+**Arguments:**  
+
+1. none
+
+**Returns:**  
+
+* (_Object_): SmartObject.
+
+**Examples:** 
+
+```js
+cnode.getSmartObject();
+
+/*
+SmartObject {
+    ...
+}
+*/
+```
 *************************************************
 <a name="API_setDevAttrs"></a>
 ### setDevAttrs(attrs[, callback])
@@ -197,73 +225,6 @@ cnode.setDevAttrs({ lifetime: 12000 }, function (err, rsp) {
 });
 ```
 
-*************************************************
-<a name="API_readResrc"></a>
-### readResrc(oid, iid, rid[, callback])
-Read a value from the allocated Resource.  
-
-**Arguments:**  
-
-1. `oid` (_String_ | _Number_): Object id.  
-2. `iid` (_String_ | _Number_): Object Instance id.  
-3. `rid` (_String_ | _Number_): Resource id of the allocated Resource.  
-4. `callback` (_Function_): `function (err, val) { }`, where `val` is the read result.  
-
-    If the Resource is not a simple value and there has not a read method been initialized for it, the `val` passes to the callback will be a string '\_unreadable\_'. If the Resource is an executable resource, the `val` passes to the callback will be a string '\_exec\_'. If the Resource is not found, an error will be passed to first argument of the callback.  
-
-**Returns:**  
-
-* (none)
-
-**Examples:** 
-
-```js
-cnode.readResrc('temperature', 0, 'sensorValue', function (err, val) {
-    console.log(val);   // 21
-});
-
-cnode.readResrc('dIn', 0, 'dInState', function (err, val) {
-    console.log(val);   // _unreadable_
-});
-
-cnode.readResrc('led', 0, 'blink', function (err, val) {
-    console.log(val);   // _exec_
-});
-```
-*************************************************
-<a name="API_writeResrc"></a>
-### writeResrc(oid, iid, rid, value[, callback])
-Write a value to the allocated Resource.  
-
-**Arguments:**  
-
-1. `oid` (_String_ | _Number_): Object id.  
-2. `iid` (_String_ | _Number_): Object Instance id.  
-3. `rid` (_String_ | _Number_): Resource id.  
-4. `value` (_Depends_): value to write to the allocated Resource.  
-5. `callback` (_Function_): `function (err, val) { }`, where `val` is the written value.  
-
-    If the Resource is not a simple value and there has not a write method been initialized for it, the `val` passes to the callback will be a string '\_unwritable\_'. If the Resource is an executable Resource, the `val` passes to the callback will be a string '\_exec\_'. If the allocated Resource is not found, an error will be passed to first argument of the callback.  
-
-**Returns:**  
-
-* (none)
-
-**Examples:** 
-
-```js
-cnode.writeResrc('temperature', 0, 'sensorValue', 19, function (err, val) {
-    console.log(val);   // 19
-});
-
-cnode.writeResrc('dOut', 0, 'dOutState', true, function (err, val) {
-    console.log(val);   // _unwriteable_
-});
-
-cnode.writeResrc('led', 0, 'blink', 19, function (err, val) {
-    console.log(val);   // _exec_
-});
-```
 *************************************************
 <a name="API_register"></a>
 ### register(ip, port[, callback])
@@ -371,31 +332,3 @@ Fired when there is an announce from the Server.
 Fired when there is an error occurred.  
 
 *************************************************
-
-  
-<br />
-
-<a name="Templates"></a>
-## 7. Code Templates
-
-[Here is the document](https://github.com/PeterEB/coap-node/blob/develop/docs/templates.md) that provides you with many code templates of IPSO-defined devices. Each template gives the code snippet of how to initialize an Object Instance with its oid and iid, and lists every Resource the Object Instance may have.  
-
-The following example shows how to create an **digital input** Object Instance. In the code snippet, commented lines are optional Resources. A phrase `< rid = 5500, R, Boolean >` tells the access permission and data type of a Resource.  
-  
-```js
-// Create an Object Instance: Digital Input (oid = 3200 or 'dIn')
-
-so.init('dIn', 0, {
-    dInState: {                     // < rid = 5500, R, Boolean >
-        read: function (cb) {}
-    },
-    // counter: ,                   // < rid = 5501,  R, Integer >
-    // dInPolarity: ,               // < rid = 5502, RW, Boolean >
-    // debouncePeriod: ,            // < rid = 5503, RW, Integer, ms >
-    // edgeSelection: ,             // < rid = 5504, RW, Integer { 1: fall, 2: rise, 3: both } >
-    // counterReset: ,              // < rid = 5505,  E, Opaque >
-    // appType: ,                   // < rid = 5750, RW, String >
-    // sensorType:                  // < rid = 5751,  R, String >
-});
-```
-
