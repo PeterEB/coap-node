@@ -11,34 +11,23 @@ var so = new SmartObject();
 
 var node = new CoapNode('utNode', so);
 
-shepherd.on('error', function (err) {
-    console.log(err);
-});
-
-node.on('error', function (err) {
-    console.log(err);
-});
-
 try {
     fs.unlinkSync(path.resolve('./node_modules/coap-shepherd/lib/database/coap.db'));
 } catch (e) {
     console.log(e);
 }
 
-describe('coap-node registration test', function() {
+describe('coap-node - Functional Check', function() {
     this.timeout(15000);
 
-    describe('start connection test', function() {
-        it('start - shepherd', function (done) {
-            shepherd.start(function () {
-                done();
-            });
+    before(function (done) {
+        shepherd.start(function () {
+            done();
         });
     });
 
-    describe('coap-node tries to register', function() {
-
-        it('register - register', function (done) {
+    describe('#.register()', function() {
+        it('should register device and return msg with status 2.01', function (done) {
             shepherd.permitJoin(300);
 
             var devRegHdlr = function (msg) {
@@ -65,7 +54,7 @@ describe('coap-node registration test', function() {
             });
         });
 
-        it('register - register again', function (done) {
+        it('should register device again and return msg with status 2.04', function (done) {
             var devRegHdlr = function (msg) {
                 switch(msg.type) {
                     case 'registered':
@@ -87,8 +76,8 @@ describe('coap-node registration test', function() {
         });
     });
 
-    describe('coap-node tries to setDevAttrs', function() {
-        it('setDevAttrs - update', function (done) {
+    describe('#.setDevAttrs()', function() {
+        it('should update device attrs and return msg with status 2.04', function (done) {
             var devUpdateHdlr = function (msg) {
                 switch(msg.type) {
                     case 'update':
@@ -112,7 +101,7 @@ describe('coap-node registration test', function() {
             });
         });
 
-        it('setDevAttrs - change port', function (done) {
+        it('should update device port and return msg with status 2.04', function (done) {
             node.setDevAttrs({}, function (err, msg) {
                 if (msg.status === '2.04') {
                     done();
@@ -120,7 +109,7 @@ describe('coap-node registration test', function() {
             });
         });
 
-        it('setDevAttrs - bed req', function (done) {
+        it('should return msg with status 4.00 when the attrs is bad', function (done) {
             node.setDevAttrs({ name: 'peter' }, function (err, msg) {
                 if (msg.status === '4.00') {
                     done();
@@ -129,8 +118,8 @@ describe('coap-node registration test', function() {
         });
     });
 
-    describe('coap-node tries to deregister', function() {
-        it('deregister - deregister', function (done) {
+    describe('#.deregister()', function() {
+        it('should deregister device and return msg with status 2.02', function (done) {
             var devDeregHdlr = function (msg) {
                 var cn;
 
@@ -150,10 +139,12 @@ describe('coap-node registration test', function() {
 
             shepherd.on('ind', devDeregHdlr);
 
-            node.deregister(function (err, msg) {});
+            node.deregister(function (err, msg) {
+                expect(msg.status).to.be.eql('2.02');
+            });
         });
 
-        it('deregister - deregister again', function (done) {
+        it('should return msg with status 4.04 when the device is not registered', function (done) {
             node.deregister(function (err, msg) {
                 if (msg.status === '4.04') {
                     done();
@@ -161,7 +152,7 @@ describe('coap-node registration test', function() {
             });
         });
 
-        it('deregister - setDevAttrs after deregister', function (done) {
+        it('should return msg with status 4.04 when the device is not registered', function (done) {
             node.setDevAttrs({ lifetime: 12000 }, function (err, msg) {
                 if (msg.status === '4.04') {
                     done();
@@ -170,12 +161,9 @@ describe('coap-node registration test', function() {
         });
     });
 
-    describe('stop', function() {
-        it('stop - shepherd', function (done) {
-            shepherd.stop(function () {
-                done();
-            });
+    after(function (done) {
+        shepherd.stop(function () {
+            done();
         });
     });
-
 });
