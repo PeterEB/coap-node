@@ -65,7 +65,6 @@ coapNode.register('127.0.0.1', 5683, function (err, rsp) {
 //     });
 // }, 10000);
 
-
 // setDevAttrs test
 // setTimeout(function () {
 //     coapNode.setDevAttrs({ lifetime: 85741 }, function (err, rsp) {
@@ -86,3 +85,15 @@ coapNode.register('127.0.0.1', 5683, function (err, rsp) {
 //         console.log(rsp);
 //     });
 // }, 30000);
+
+setTimeout(function () {
+    coapNode.checkOut(10, function (err, rsp) {
+        console.log(rsp);
+    });
+}, 5000);
+
+setTimeout(function () {
+    coapNode.checkIn(function (err, rsp) {
+        console.log(rsp);
+    });
+}, 15000);
