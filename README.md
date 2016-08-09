@@ -22,7 +22,7 @@ coap-node
 
 **coap-node** is a module that aims to provide a simple way to build M2M/IoT client devices managed by a **coap-shepherd** server. This module follows [**IPSO**](http://www.ipso-alliance.org/smart-object-guidelines/) data model to well organize and define resources on a machine node. 
 
-This module uses [smartobject](https://github.com/PeterEB/smartobject) as its fundamental of resource organizing on devices. **smartobject** can help you create smart objects with IPSO data model, and it also provides a scheme to help you abstract your hardware into smart objects. You may like to use **smartobject** to create many plugins for your own hardware or modules, i.e., temperature sensor, humidity sensor, light control.  
+This module uses [smartobject](https://github.com/PeterEB/smartobject) as its fundamental of resource organizing on devices. **smartobject** can help you create smart objects with IPSO data model, and it also provides a scheme to help you abstract your hardware into smart objects. You may like to use **smartobject** to create many plugins for your own hardware or modules, i.e., temperature sensor, humidity sensor, light control. Here is a [tutorual of how to plan resources](https://github.com/PeterEB/smartobject/blob/master/docs/resource_plan.md) with smartobject.
 
 ###Acronyms and Abbreviations
 
@@ -114,6 +114,8 @@ cnode.write('/temperature/1/sensorValue', function (err, rsp) {
 * [setDevAttrs()](#API_setDevAttrs)
 * [register()](#API_register)
 * [deregister()](#API_deregister)
+* [checkout()](#API_checkout)
+* [checkin()](#API_checkin)
 * Events: [registered](#EVT_registered), [updated](#EVT_updated), [deregistered](#EVT_deregistered), [announce](#announce), and [error](#EVT_error)
 
 *************************************************
@@ -296,6 +298,70 @@ cnode.on('deregistered', function () {
 
 cnode.deregister(function (err, rsp) {
     console.log(rsp);   // { status: '2.02' }
+});
+```
+
+*************************************************
+<a name="API_checkout"></a>
+### checkout([duration, ][callback])
+[TBD]
+
+**Arguments:**  
+
+1. `callback` (_Function_): `function (err, rsp) { }`, where `rsp` is the response object with a status code to tell whether this request is successful.  
+
+    * `rsp.status` (_String_)
+
+        | rsp.status | Status                | Description                                  |
+        |------------|-----------------------|----------------------------------------------|
+        | '2.04'     | Changed               | The device was successfully checkout.        |
+        | '4.04'     | Not Found             | The device was not registered to the Server. |
+        | '4.08'     | Timeout               | No response from the Server in 60 secs.      |
+        | '5.00'     | Internal Server Error | Something wrong with the Server.             |
+
+**Returns:**  
+
+* (none)
+
+**Examples:** 
+
+```js
+cnode.checkout(function (err, rsp) {
+    console.log(rsp);   // { status: '2.04' }
+});
+
+cnode.checkout(30, function (err, rsp) {
+    console.log(rsp);   // { status: '2.04' }
+});
+```
+
+*************************************************
+<a name="API_checkin"></a>
+### checkin([callback])
+[TBD] 
+
+**Arguments:**  
+
+1. `callback` (_Function_): `function (err, rsp) { }`, where `rsp` is the response object with a status code to tell whether this request is successful.  
+
+    * `rsp.status` (_String_)
+
+        | rsp.status | Status                | Description                                  |
+        |------------|-----------------------|----------------------------------------------|
+        | '2.04'     | Changed               | The device was successfully checkin.         |
+        | '4.04'     | Not Found             | The device was not registered to the Server. |
+        | '4.08'     | Timeout               | No response from the Server in 60 secs.      |
+        | '5.00'     | Internal Server Error | Something wrong with the Server.             |
+
+**Returns:**  
+
+* (none)
+
+**Examples:** 
+
+```js
+cnode.checkin(function (err, rsp) {
+    console.log(rsp);   // { status: '2.04' }
 });
 ```
 

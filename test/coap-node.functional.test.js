@@ -118,9 +118,9 @@ describe('coap-node - Functional Check', function() {
         });
     });
 
-    describe('#.checkOut()', function () {
+    describe('#.checkout()', function () {
         it('should chect out and _sleep will be true', function (done) {
-            node.checkOut(function (err, msg) {
+            node.checkout(function (err, msg) {
                 if (msg.status === '2.04') {
                     expect(node._sleep).to.be.eql(true);
                     done();
@@ -129,7 +129,7 @@ describe('coap-node - Functional Check', function() {
         });
 
         it('should chect out and _sleep will be true with duration', function (done) {
-            node.checkOut(10, function (err, msg) {
+            node.checkout(10, function (err, msg) {
                 if (msg.status === '2.04') {
                     expect(node._sleep).to.be.eql(true);
                     done();
@@ -138,9 +138,9 @@ describe('coap-node - Functional Check', function() {
         });
     });
 
-    describe('#.checkIn()', function () {
+    describe('#.checkin()', function () {
         it('should chect in and _sleep will be false', function (done) {
-            node.checkIn(function (err, msg) {
+            node.checkin(function (err, msg) {
                 if (msg.status === '2.04') {
                     expect(node._sleep).to.be.eql(false);
                     done();

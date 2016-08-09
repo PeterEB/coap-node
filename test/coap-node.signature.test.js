@@ -135,17 +135,17 @@ describe('coap-node - Signature Check', function () {
         });
     });
 
-    describe('#.checkOut()', function () {
+    describe('#.checkout()', function () {
         it('should throw TypeError if duration is not a number', function () {
-            expect(function () { return node.checkOut(null); }).to.throw(TypeError);
-            expect(function () { return node.checkOut(NaN); }).to.throw(TypeError);
-            expect(function () { return node.checkOut('xx'); }).to.throw(TypeError);
-            expect(function () { return node.checkOut([]); }).to.throw(TypeError);
-            expect(function () { return node.checkOut({}); }).to.throw(TypeError);
-            expect(function () { return node.checkOut(true); }).to.throw(TypeError);
-            expect(function () { return node.checkOut(new Date()); }).to.throw(TypeError);
+            expect(function () { return node.checkout(null); }).to.throw(TypeError);
+            expect(function () { return node.checkout(NaN); }).to.throw(TypeError);
+            expect(function () { return node.checkout('xx'); }).to.throw(TypeError);
+            expect(function () { return node.checkout([]); }).to.throw(TypeError);
+            expect(function () { return node.checkout({}); }).to.throw(TypeError);
+            expect(function () { return node.checkout(true); }).to.throw(TypeError);
+            expect(function () { return node.checkout(new Date()); }).to.throw(TypeError);
 
-            expect(function () { return node.checkOut(100); }).not.to.throw(TypeError);
+            expect(function () { return node.checkout(100); }).not.to.throw(TypeError);
         });
     });
 });
