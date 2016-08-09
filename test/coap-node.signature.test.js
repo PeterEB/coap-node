@@ -134,4 +134,18 @@ describe('coap-node - Signature Check', function () {
             expect(function () { return node.register('192.168.1.1', function () {}); }).to.throw(TypeError);
         });
     });
+
+    describe('#.checkOut()', function () {
+        it('should throw TypeError if duration is not a number', function () {
+            expect(function () { return node.checkOut(null); }).to.throw(TypeError);
+            expect(function () { return node.checkOut(NaN); }).to.throw(TypeError);
+            expect(function () { return node.checkOut('xx'); }).to.throw(TypeError);
+            expect(function () { return node.checkOut([]); }).to.throw(TypeError);
+            expect(function () { return node.checkOut({}); }).to.throw(TypeError);
+            expect(function () { return node.checkOut(true); }).to.throw(TypeError);
+            expect(function () { return node.checkOut(new Date()); }).to.throw(TypeError);
+
+            expect(function () { return node.checkOut(100); }).not.to.throw(TypeError);
+        });
+    });
 });

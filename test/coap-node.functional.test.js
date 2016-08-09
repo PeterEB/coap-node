@@ -118,6 +118,37 @@ describe('coap-node - Functional Check', function() {
         });
     });
 
+    describe('#.checkOut()', function () {
+        it('should chect out and _sleep will be true', function (done) {
+            node.checkOut(function (err, msg) {
+                if (msg.status === '2.04') {
+                    expect(node._sleep).to.be.eql(true);
+                    done();
+                }
+           });
+        });
+
+        it('should chect out and _sleep will be true with duration', function (done) {
+            node.checkOut(10, function (err, msg) {
+                if (msg.status === '2.04') {
+                    expect(node._sleep).to.be.eql(true);
+                    done();
+                }
+           });
+        });
+    });
+
+    describe('#.checkIn()', function () {
+        it('should chect in and _sleep will be false', function (done) {
+            node.checkIn(function (err, msg) {
+                if (msg.status === '2.04') {
+                    expect(node._sleep).to.be.eql(false);
+                    done();
+                }
+            }); 
+        });
+    });
+
     describe('#.deregister()', function() {
         it('should deregister device and return msg with status 2.02', function (done) {
             var devDeregHdlr = function (msg) {
