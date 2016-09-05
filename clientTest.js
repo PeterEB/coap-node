@@ -65,26 +65,19 @@ coapNode.register('127.0.0.1', 5683, function (err, rsp) {
 //     });
 // }, 10000);
 
-// setDevAttrs test
+// update test
 // setTimeout(function () {
-//     coapNode.setDevAttrs({ lifetime: 85741 }, function (err, rsp) {
+//     coapNode.update({ lifetime: 85741 }, function (err, rsp) {
 //         console.log(rsp);
 //     });
 // }, 15000);
-
-// update test
-// setTimeout(function () {
-//     coapNode._update({ lifetime: 86400 }, function (err, rsp) {
-//         console.log(rsp);
-//     });
-// }, 20000);
 
 // // deregister test
 // setTimeout(function () {
 //     coapNode.deregister(function (err, rsp) {
 //         console.log(rsp);
 //     });
-// }, 30000);
+// }, 20000);
 
 setTimeout(function () {
     coapNode.checkOut(10, function (err, rsp) {

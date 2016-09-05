@@ -49,8 +49,8 @@ describe('coap-node - reqHandler Check', function() {
 
             var devRegHdlr = function (msg) {
                     switch(msg.type) {
-                        case 'registered':
-                            if (msg.data.clientName === 'utNode') {
+                        case 'devIncoming':
+                            if (msg.cnode.clientName === 'utNode') {
                                 shepherd.removeListener('ind', devRegHdlr);
                                 remoteNode = shepherd.find('utNode');
                                 done(); 
@@ -425,8 +425,8 @@ describe('coap-node - reqHandler Check', function() {
         it('observe - resource', function (done) {
             var devNotifyHdlr = function (msg) {
                     switch(msg.type) {
-                        case 'notify':
-                            if (msg.data.device === 'utNode') {
+                        case 'devNotify':
+                            if (msg.cnode.clientName === 'utNode') {
                                 expect(msg.data.path).to.be.eql('/temperature/0/sensorValue');
                                 expect(msg.data.value).to.be.eql(19);
                                 shepherd.removeListener('ind', devNotifyHdlr);
@@ -500,7 +500,7 @@ describe('coap-node - reqHandler Check', function() {
 
             var devNotifyHdlr = function (msg) {
                     switch(msg.type) {
-                        case 'notify':
+                        case 'devNotify':
                             if (msg.data.path === '/temperature/0') {
                                 expect(msg.data.value).to.be.eql(reqObj2);
                                 shepherd.removeListener('ind', devNotifyHdlr);

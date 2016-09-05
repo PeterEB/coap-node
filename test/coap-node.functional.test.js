@@ -32,8 +32,8 @@ describe('coap-node - Functional Check', function() {
 
             var devRegHdlr = function (msg) {
                     switch(msg.type) {
-                        case 'registered':
-                            if (msg.data.clientName === 'utNode') {
+                        case 'devIncoming':
+                            if (msg.cnode.clientName === 'utNode') {
                                 shepherd.removeListener('ind', devRegHdlr);
                                 done(); 
                             }
@@ -57,8 +57,8 @@ describe('coap-node - Functional Check', function() {
         it('should register device again and return msg with status 2.04', function (done) {
             var devRegHdlr = function (msg) {
                 switch(msg.type) {
-                    case 'registered':
-                        if (msg.data.clientName === 'utNode') {
+                    case 'devIncoming':
+                        if (msg.cnode.clientName === 'utNode') {
                             shepherd.removeListener('ind', devRegHdlr);
                             done(); 
                         }
@@ -76,12 +76,12 @@ describe('coap-node - Functional Check', function() {
         });
     });
 
-    describe('#.setDevAttrs()', function() {
+    describe('#.update()', function() {
         it('should update device attrs and return msg with status 2.04', function (done) {
             var devUpdateHdlr = function (msg) {
                 switch(msg.type) {
-                    case 'update':
-                        if (msg.data.device === 'utNode') {
+                    case 'devUpdate':
+                        if (msg.cnode.clientName === 'utNode') {
                             expect(msg.data.lifetime).to.be.eql(60000);
                             shepherd.removeListener('ind', devUpdateHdlr);
                             done(); 
@@ -94,7 +94,7 @@ describe('coap-node - Functional Check', function() {
 
             shepherd.on('ind', devUpdateHdlr);
 
-            node.setDevAttrs({ lifetime: 60000 }, function (err, msg) {
+            node.update({ lifetime: 60000 }, function (err, msg) {
                 if (msg.status === '2.04') {
                     expect(node.lifetime).to.be.eql(60000);
                 }
@@ -102,7 +102,7 @@ describe('coap-node - Functional Check', function() {
         });
 
         it('should update device port and return msg with status 2.04', function (done) {
-            node.setDevAttrs({}, function (err, msg) {
+            node.update({}, function (err, msg) {
                 if (msg.status === '2.04') {
                     done();
                 }
@@ -110,7 +110,7 @@ describe('coap-node - Functional Check', function() {
         });
 
         it('should return msg with status 4.00 when the attrs is bad', function (done) {
-            node.setDevAttrs({ name: 'peter' }, function (err, msg) {
+            node.update({ name: 'peter' }, function (err, msg) {
                 if (msg.status === '4.00') {
                     done();
                 }
@@ -155,8 +155,8 @@ describe('coap-node - Functional Check', function() {
                 var cn;
 
                 switch(msg.type) {
-                    case 'deregistered':
-                        if (msg.data === 'utNode') {
+                    case 'devLeaving':
+                        if (msg.cnode === 'utNode') {
                             shepherd.removeListener('ind', devDeregHdlr);
                             cn = shepherd.find('utNode');
                             expect(cn).to.be.eql(undefined);
@@ -184,7 +184,7 @@ describe('coap-node - Functional Check', function() {
         });
 
         it('should return msg with status 4.04 when the device is not registered', function (done) {
-            node.setDevAttrs({ lifetime: 12000 }, function (err, msg) {
+            node.update({ lifetime: 12000 }, function (err, msg) {
                 if (msg.status === '4.04') {
                     done();
                 }

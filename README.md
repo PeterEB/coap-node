@@ -111,9 +111,9 @@ cnode.write('/temperature/1/sensorValue', function (err, rsp) {
 
 * [new CoapNode()](#API_CoapNode)
 * [getSmartObject()](#API_getSmartObject)
-* [setDevAttrs()](#API_setDevAttrs)
 * [register()](#API_register)
 * [deregister()](#API_deregister)
+* [update()](#API_update)
 * [checkout()](#API_checkout)
 * [checkin()](#API_checkin)
 * Events: [registered](#EVT_registered), [updated](#EVT_updated), [deregistered](#EVT_deregistered), [announce](#announce), and [error](#EVT_error)
@@ -182,49 +182,6 @@ SmartObject {
     ...
 }
 */
-```
-*************************************************
-<a name="API_setDevAttrs"></a>
-### setDevAttrs(attrs[, callback])
-Set device attributes of the cnode and send an update request to the Server.
-
-**Arguments:**  
-
-1. `attrs` (_Object_): Device attributes.  
-
-    |  Property  | Type   | Required |
-    |------------|--------|----------|
-    | lifetime   | Number | optional | 
-    | version    | String | optional |
-
-2. `callback` (_Function_): `function (err, rsp) { }`. Get called after the Server accomplishes the update. `rsp` is the response object with a status code to tell whether this operation is successful.  
-
-    * `rsp.status` (_String_)  
-
-        | rsp.status | Status                | Description                                                |
-        |------------|-----------------------|------------------------------------------------------------|
-        | '2.00'     | Ok                    | No device attribute update needed.                         |
-        | '2.04'     | Changed               | Set device attributes operation is completed successfully. |
-        | '4.00'     | Bad Request           | There is an unrecognized attribute in the update request.  |
-        | '4.04'     | Not Found             | The device was not registered on the Server.               |
-        | '4.08'     | Timeout               | No response from the Server in 60 secs.                    |
-        | '5.00'     | Internal Server Error | Something wrong with the Server.                           |
-
-**Returns:**  
-
-* (none)
-
-**Examples:** 
-
-```js
-// This event fired when the device attributes updated (2.04). 
-cnode.on('updated', function () {
-    console.log('updated');
-});
-
-cnode.setDevAttrs({ lifetime: 12000 }, function (err, rsp) {
-    console.log(rsp);   // { status: '2.04' }
-});
 ```
 
 *************************************************
@@ -298,6 +255,50 @@ cnode.on('deregistered', function () {
 
 cnode.deregister(function (err, rsp) {
     console.log(rsp);   // { status: '2.02' }
+});
+```
+
+*************************************************
+<a name="API_update"></a>
+### update(attrs[, callback])
+Set device attributes of the cnode and send an update request to the Server.
+
+**Arguments:**  
+
+1. `attrs` (_Object_): Device attributes.  
+
+    |  Property  | Type   | Required |
+    |------------|--------|----------|
+    | lifetime   | Number | optional | 
+    | version    | String | optional |
+
+2. `callback` (_Function_): `function (err, rsp) { }`. Get called after the Server accomplishes the update. `rsp` is the response object with a status code to tell whether this operation is successful.  
+
+    * `rsp.status` (_String_)  
+
+        | rsp.status | Status                | Description                                                |
+        |------------|-----------------------|------------------------------------------------------------|
+        | '2.00'     | Ok                    | No device attribute update needed.                         |
+        | '2.04'     | Changed               | Set device attributes operation is completed successfully. |
+        | '4.00'     | Bad Request           | There is an unrecognized attribute in the update request.  |
+        | '4.04'     | Not Found             | The device was not registered on the Server.               |
+        | '4.08'     | Timeout               | No response from the Server in 60 secs.                    |
+        | '5.00'     | Internal Server Error | Something wrong with the Server.                           |
+
+**Returns:**  
+
+* (none)
+
+**Examples:** 
+
+```js
+// This event fired when the device attributes updated (2.04). 
+cnode.on('updated', function () {
+    console.log('updated');
+});
+
+cnode.update({ lifetime: 12000 }, function (err, rsp) {
+    console.log(rsp);   // { status: '2.04' }
 });
 ```
 
