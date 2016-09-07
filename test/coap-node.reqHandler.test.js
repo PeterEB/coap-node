@@ -472,16 +472,6 @@ describe('coap-node - reqHandler Check', function() {
             });
         });
 
-        it('observe - resource is observed', function (done) {
-            remoteNode.observeReq('/temperature/0/sensorValue', function (err, msg) {
-                if (err) { 
-                    console.log(err);
-                } else if (msg.status === '2.00') {
-                    done();
-                }
-            });
-        });
-
         it('observe - instence', function (done) {
             var reqObj = {
                     sensorValue: 19,

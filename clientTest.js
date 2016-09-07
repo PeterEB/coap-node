@@ -79,14 +79,14 @@ coapNode.register('127.0.0.1', 5683, function (err, rsp) {
 //     });
 // }, 20000);
 
-setTimeout(function () {
-    coapNode.checkOut(10, function (err, rsp) {
-        console.log(rsp);
-    });
-}, 5000);
+// setTimeout(function () {
+//     coapNode.checkOut(10, function (err, rsp) {
+//         console.log(rsp);
+//     });
+// }, 5000);
 
-setTimeout(function () {
-    coapNode.checkIn(function (err, rsp) {
-        console.log(rsp);
-    });
-}, 15000);
+// setTimeout(function () {
+//     coapNode.checkIn(function (err, rsp) {
+//         console.log(rsp);
+//     });
+// }, 15000);
