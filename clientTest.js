@@ -15,6 +15,7 @@ so.init(3303, 0, {
     5703: { 
         write: function (val, cb) {     
             console.log('write ' + val);  
+            cb(null, val);
         }    
     },
     5704: { 
@@ -45,8 +46,8 @@ coapNode.on('updated', function (msg) {
 });
 
 coapNode.on('error', function (err) {
-    throw err;
-    // console.log('error: ' + err);
+    // throw err;
+    console.log(err);
 });
 
 coapNode.register('127.0.0.1', 5683, function (err, rsp) {
