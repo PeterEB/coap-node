@@ -54,6 +54,10 @@ coapNode.register('127.0.0.1', 5683, function (err, rsp) {
     console.log(rsp);
 });
 
+setInterval(function () {
+    so.read(3303, 0, 5702, function () {});
+}, 5000);
+
 // setTimeout(function () {
 //     coapNode.register('127.0.0.1', 5683, function (err, rsp) {
 //         console.log(rsp);
