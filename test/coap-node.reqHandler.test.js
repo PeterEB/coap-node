@@ -28,7 +28,8 @@ var iObj = {
             console.log(val1 + ': Hello ' + val2 + '!');
             cb(null);
         }
-    }
+    },
+    5705: 21
 };
 
 so.init('temperature', 0, iObj);
@@ -108,7 +109,8 @@ describe('coap-node - reqHandler Check', function() {
                         units: 'C',
                         5702: '2016/03/18',
                         5703: '_unreadable_',
-                        5704: '_exec_'
+                        5704: '_exec_',
+                        5705: 21
                     };
 
                 if (err) { 
@@ -128,7 +130,8 @@ describe('coap-node - reqHandler Check', function() {
                             units: 'C',
                             5702: '2016/03/18',
                             5703: '_unreadable_',
-                            5704: '_exec_'
+                            5704: '_exec_',
+                            5705: 21
                         }
                     };
 
@@ -140,17 +143,11 @@ describe('coap-node - reqHandler Check', function() {
                 }
             });
         });
-
-        it('read - bad path', function (done) {
-            remoteNode.readReq(3303, function (err, msg) {
-                if (err) done();
-            });
-        });
     });
 
     describe('#writeReq', function() {
         it('write - resource', function (done) {
-            remoteNode.writeReq('/temperature/0/sensorValue', 19, function (err, msg) {
+            remoteNode.writeReq('/temperature/0/5703', 19, function (err, msg) {
                 if (err) { 
                     console.log(err);
                 } else if (msg.status === '2.04') done();
@@ -175,9 +172,8 @@ describe('coap-node - reqHandler Check', function() {
 
         it('write - instence', function (done) {
             var inst = {
-                    5700: 21,
-                    5701: 'C',
-                    5703: 'x'
+                    5703: 'x',
+                    5705: 21
                 };
 
             remoteNode.writeReq('/temperature/0', inst, function (err, msg) {
@@ -200,28 +196,6 @@ describe('coap-node - reqHandler Check', function() {
                 if (err) { 
                     console.log(err);
                 } else if (msg.status === '4.05') done();
-            });
-        });
-
-        it('write - object', function (done) {
-            var obj = {
-                0: {
-                        5700: 21,
-                        5701: 'C',
-                        5702: '2016/03/18',
-                        5703: '_unreadable_',
-                        5704: '_exec_'
-                    }
-                };
-
-            remoteNode.writeReq('/temperature', obj, function (err, msg) {
-                if (err) done();
-            });
-        });
-
-        it('write - bad path', function (done) {
-            remoteNode.writeReq(3303, 'x', function (err, msg) {
-                if (err) done();
             });
         });
     });
@@ -257,24 +231,6 @@ describe('coap-node - reqHandler Check', function() {
             });
         });
 
-        it('execute - instence', function (done) {
-            remoteNode.executeReq('/temperature/0', function (err, msg) {
-                if (err) done();
-            });
-        });
-
-        it('execute - object', function (done) {
-            remoteNode.executeReq('/temperature', function (err, msg) {
-                if (err) done();
-            });
-        });
-
-        it('execute - bad path', function (done) {
-            remoteNode.executeReq(3303, 'x', function (err, msg) {
-                if (err) done();
-            });
-        });
-
         it('execute - bad argus', function (done) {
             remoteNode.executeReq('/temperature/0/5703', 'x', function (err, msg) {
                 if (err) done();
@@ -301,7 +257,7 @@ describe('coap-node - reqHandler Check', function() {
         it('discover - instence', function (done) {
             var result = { 
                     attrs: { pmin: 0, pmax: 60 },
-                    resrcList: { 0: ['5702', '5703', '5704', 'sensorValue', 'units'] } 
+                    resrcList: { 0: ['5702', '5703', '5704', '5705', 'sensorValue', 'units'] } 
                 };
             
             remoteNode.discoverReq('/temperature/0', function (err, msg) {
@@ -317,7 +273,7 @@ describe('coap-node - reqHandler Check', function() {
         it('discover - object', function (done) {
             var result = { 
                     attrs: { pmin: 0, pmax: 60 },
-                    resrcList: { 0: ['5702', '5703', '5704', 'sensorValue', 'units'] } 
+                    resrcList: { 0: ['5702', '5703', '5704', '5705', 'sensorValue', 'units'] } 
                 };
             
             remoteNode.discoverReq('/temperature', function (err, msg) {
@@ -327,12 +283,6 @@ describe('coap-node - reqHandler Check', function() {
                     expect(msg.data).to.be.eql(result);
                     done();
                 }
-            });
-        });
-
-        it('discover - bad path', function (done) {
-            remoteNode.discoverReq(3303, function (err, msg) {
-                if (err) done();
             });
         });
     });
@@ -347,7 +297,7 @@ describe('coap-node - reqHandler Check', function() {
                 stp: 0.5
             };
 
-            remoteNode.writeAttrsReq('/temperature/0/sensorValue', attrs, function (err, msg) {
+            remoteNode.writeAttrsReq('/temperature/0/5705', attrs, function (err, msg) {
                 if (err) { 
                     console.log(err);
                 } else if (msg.status === '2.04') done();
@@ -386,32 +336,6 @@ describe('coap-node - reqHandler Check', function() {
             });
         });
 
-        it('writeAttrs - bad path', function (done) {
-            var attrs = {
-                pmin: 10,
-                pmax: 90,
-                gt: 0,
-                lt: 100,
-                stp: 0.5
-            };
-            
-            remoteNode.writeAttrsReq(3303, attrs, function (err, msg) {
-                if (err) done();
-            });
-        });
-
-        it('writeAttrs - bad attrs', function (done) {
-            remoteNode.writeAttrsReq('/temperature/0/sensorValue', 'x', function (err, msg) {
-                if (err) done();
-            });
-        });
-
-        it('writeAttrs - bad attrs', function (done) {          
-            remoteNode.writeAttrsReq('/temperature/0/sensorValue', [ 10 ], function (err, msg) {
-                if (err) done();
-            });
-        });
-
         it('writeAttrs - bad attrs', function (done) {
             var attrs = { x: 100 };
             
@@ -427,7 +351,7 @@ describe('coap-node - reqHandler Check', function() {
                     switch(msg.type) {
                         case 'devNotify':
                             if (msg.cnode.clientName === 'utNode') {
-                                expect(msg.data.path).to.be.eql('/temperature/0/sensorValue');
+                                expect(msg.data.path).to.be.eql('/temperature/0/5705');
                                 expect(msg.data.value).to.be.eql(19);
                                 shepherd.removeListener('ind', devNotifyHdlr);
                                 done(); 
@@ -440,13 +364,13 @@ describe('coap-node - reqHandler Check', function() {
 
             shepherd.on('ind', devNotifyHdlr);
 
-            remoteNode.observeReq('/temperature/0/sensorValue', function (err, msg) {
+            remoteNode.observeReq('/temperature/0/5705', function (err, msg) {
                 if (err) { 
                     console.log(err);
                 } else if (msg.status === '2.05') {
                     expect(msg.data).to.be.eql(21);
-                    remoteNode.writeReq('/temperature/0/sensorValue', 21.2, function (err, msg) {
-                        remoteNode.writeReq('/temperature/0/sensorValue', 19, function (err, msg) {});
+                    remoteNode.writeReq('/temperature/0/5705', 21.2, function (err, msg) {
+                        remoteNode.writeReq('/temperature/0/5705', 19, function (err, msg) {});
                     });
                 }
             });
@@ -474,18 +398,20 @@ describe('coap-node - reqHandler Check', function() {
 
         it('observe - instence', function (done) {
             var reqObj = {
-                    sensorValue: 19,
+                    sensorValue: 21,
                     units: 'C',
                     5702: '2016/03/18',
                     5703: '_unreadable_',
-                    5704: '_exec_'
+                    5704: '_exec_',
+                    5705: 19
                 },
                 reqObj2 = {
-                    sensorValue: 22,
+                    sensorValue: 21,
                     units: 'C',
                     5702: '2016/03/18',
                     5703: '_unreadable_',
-                    5704: '_exec_'
+                    5704: '_exec_',
+                    5705: 22
                 };
 
             var devNotifyHdlr = function (msg) {
@@ -509,7 +435,7 @@ describe('coap-node - reqHandler Check', function() {
                     console.log(err);
                 } else if (msg.status === '2.05') {
                     expect(msg.data).to.be.eql(reqObj);
-                    remoteNode.writeReq('/temperature/0/sensorValue', 22, function (err, msg) {});
+                    remoteNode.writeReq('/temperature/0/5705', 22, function (err, msg) {});
                 }
             });
         });
@@ -522,17 +448,11 @@ describe('coap-node - reqHandler Check', function() {
                     done();
             });
         });
-
-        it('observe - bad path', function (done) {
-            remoteNode.observeReq(3303, function (err, msg) {
-                if (err) done();
-            });
-        });
     });
 
     describe('#cancelObserveReq', function() {
         it('cancelObserve - resource', function (done) {
-            remoteNode.cancelObserveReq('/temperature/0/sensorValue', function (err, msg) {
+            remoteNode.cancelObserveReq('/temperature/0/5705', function (err, msg) {
                 if (err) { 
                     console.log(err);
                 } else if (msg.status === '2.05') done();
@@ -560,12 +480,6 @@ describe('coap-node - reqHandler Check', function() {
                 if (err) { 
                     console.log(err);
                 } else if (msg.status === '4.05') done();
-            });
-        });
-
-        it('cancelObserve - bad path', function (done) {
-            remoteNode.cancelObserveReq(3303, function (err, msg) {
-                if (err) done();
             });
         });
     });
