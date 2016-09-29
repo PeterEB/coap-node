@@ -18,7 +18,7 @@ try {
 }
 
 describe('coap-node - Functional Check', function() {
-    this.timeout(15000);
+    // this.timeout(15000);
 
     before(function (done) {
         shepherd.start(function () {
