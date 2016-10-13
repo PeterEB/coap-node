@@ -41,12 +41,23 @@ coapNode.on('deregistered', function (msg) {
     console.log('deregistered');
 });
 
-coapNode.on('updated', function (msg) {
-    console.log('updated');
+coapNode.on('login', function (msg) {
+    console.log('login');
+});
+
+coapNode.on('logout', function (msg) {
+    console.log('logout');
+});
+
+coapNode.on('offline', function (msg) {
+    console.log('offline');
+});
+
+coapNode.on('reconnect', function (msg) {
+    console.log('reconnect');
 });
 
 coapNode.on('error', function (err) {
-    // throw err;
     console.log(err);
 });
 
@@ -84,14 +95,14 @@ setInterval(function () {
 //     });
 // }, 20000);
 
-// setTimeout(function () {
-//     coapNode.checkOut(10, function (err, rsp) {
-//         console.log(rsp);
-//     });
-// }, 5000);
+setTimeout(function () {
+    coapNode.checkout(10, function (err, rsp) {
+        console.log(rsp);
+    });
+}, 5000);
 
-// setTimeout(function () {
-//     coapNode.checkIn(function (err, rsp) {
-//         console.log(rsp);
-//     });
-// }, 15000);
+setTimeout(function () {
+    coapNode.checkin(function (err, rsp) {
+        console.log(rsp);
+    });
+}, 15000);

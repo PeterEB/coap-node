@@ -116,7 +116,11 @@ cnode.write('/temperature/1/sensorValue', function (err, rsp) {
 * [update()](#API_update)
 * [checkout()](#API_checkout)
 * [checkin()](#API_checkin)
-* Events: [registered](#EVT_registered), [updated](#EVT_updated), [deregistered](#EVT_deregistered), [announce](#announce), and [error](#EVT_error)
+* Events
+    * [registered](#EVT_registered), [deregistered](#EVT_deregistered)
+    * [login](#EVT_login), [logout](#EVT_logout), [offline](#EVT_offline), [reconnect](#EVT_reconnect)
+    * [announce](#announce)
+    * [error](#EVT_error)
 
 *************************************************
 ## CoapNode Class
@@ -187,7 +191,7 @@ SmartObject {
 *************************************************
 <a name="API_register"></a>
 ### register(ip, port[, callback])
-Send a register request to the Server.  
+Send a register request to the Server. When succeeds, cnode will fire a 'registered' event and a 'login' event. 
 
 **Arguments:**  
 
@@ -213,9 +217,8 @@ Send a register request to the Server.
 **Examples:** 
 
 ```js
-// This event fired when the device registered (2.01).
 cnode.on('registered', function () {
-    console.log('registered');
+    console.log('cnode registered to the Server');
 });
 
 cnode.register('127.0.0.1', 5683, function (err, rsp) {
@@ -226,7 +229,7 @@ cnode.register('127.0.0.1', 5683, function (err, rsp) {
 *************************************************
 <a name="API_deregister"></a>
 ### deregister([callback])
-Send a deregister request to the Server.  
+Send a deregister request to the Server. The Server will remove the cnode from the registry. When succeeds, cnode will fire a 'deregistered' event and a 'logout' event. 
 
 **Arguments:**  
 
@@ -234,12 +237,12 @@ Send a deregister request to the Server.
 
     * `rsp.status` (_String_)
 
-        | rsp.status | Status                | Description                                                |
-        |------------|-----------------------|------------------------------------------------------------|
-        | '2.02'     | Deleted               | Set device attributes operation is completed successfully. |
-        | '4.04'     | Not Found             | The device was not registered to the Server.               |
-        | '4.08'     | Timeout               | No response from the Server in 60 secs.                    |
-        | '5.00'     | Internal Server Error | Something wrong with the Server.                           |
+        | rsp.status | Status                | Description                               |
+        |------------|-----------------------|-------------------------------------------|
+        | '2.02'     | Deleted               | The device was successfully deregistered. |
+        | '4.04'     | Not Found             | The device was not found on the Server.   |
+        | '4.08'     | Timeout               | No response from the Server in 60 secs.   |
+        | '5.00'     | Internal Server Error | Something wrong with the Server.          |
 
 **Returns:**  
 
@@ -248,9 +251,8 @@ Send a deregister request to the Server.
 **Examples:** 
 
 ```js
-// This event fired when the device deregistered (2.02).
 cnode.on('deregistered', function () {
-    console.log('deregistered');
+    console.log('cnode deregistered form the Server');
 });
 
 cnode.deregister(function (err, rsp) {
@@ -292,11 +294,6 @@ Set device attributes of the cnode and send an update request to the Server.
 **Examples:** 
 
 ```js
-// This event fired when the device attributes updated (2.04). 
-cnode.on('updated', function () {
-    console.log('updated');
-});
-
 cnode.update({ lifetime: 12000 }, function (err, rsp) {
     console.log(rsp);   // { status: '2.04' }
 });
@@ -305,11 +302,13 @@ cnode.update({ lifetime: 12000 }, function (err, rsp) {
 *************************************************
 <a name="API_checkout"></a>
 ### checkout([duration, ][callback])
-[TBD]
+Send a checkout request to inform the Server that cnode is going to sleep. When succeeds, cnode will fire a 'logout' event. 
 
 **Arguments:**  
 
-1. `callback` (_Function_): `function (err, rsp) { }`, where `rsp` is the response object with a status code to tell whether this request is successful.  
+1. `duration` (_Number_): How many seconds from now that cnode will check in again. 
+
+2. `callback` (_Function_): `function (err, rsp) { }`, where `rsp` is the response object with a status code to tell whether this request is successful.  
 
     * `rsp.status` (_String_)
 
@@ -327,8 +326,8 @@ cnode.update({ lifetime: 12000 }, function (err, rsp) {
 **Examples:** 
 
 ```js
-cnode.checkout(function (err, rsp) {
-    console.log(rsp);   // { status: '2.04' }
+cnode.on('logout', function () {
+    console.log('cnode has logged out from the network.');
 });
 
 cnode.checkout(30, function (err, rsp) {
@@ -339,7 +338,7 @@ cnode.checkout(30, function (err, rsp) {
 *************************************************
 <a name="API_checkin"></a>
 ### checkin([callback])
-[TBD] 
+Send a checkin request to inform the Server that cnode wake up from sleep. When succeeds, cnode will fire a 'login' event. 
 
 **Arguments:**  
 
@@ -361,6 +360,10 @@ cnode.checkout(30, function (err, rsp) {
 **Examples:** 
 
 ```js
+cnode.on('login', function () {
+    console.log('cnode has logged in the network.');
+});
+
 cnode.checkin(function (err, rsp) {
     console.log(rsp);   // { status: '2.04' }
 });
@@ -370,19 +373,37 @@ cnode.checkin(function (err, rsp) {
 <a name="EVT_registered"></a>
 ### Event: 'registered'
 `function () { }`
-Fired when the Device successfully registers to the Server.  
-
-*************************************************
-<a name="EVT_updated"></a>
-### Event: 'updated'
-`function () { }`
-Fired when the Device attributes updated.  
+Fired when the cnode successfully registers to the Server.  
 
 *************************************************
 <a name="EVT_deregistered"></a>
 ### Event: 'deregistered'
 `function () { }`
-Fired when the Device successfully deregisters from the Server.  
+Fired when the cnode successfully deregisters from the Server.  
+
+*************************************************
+<a name="EVT_login"></a>
+### Event: 'login'
+`function () { }`
+Fired when the cnode connects and login to the Server successfully.  
+
+*************************************************
+<a name="EVT_logout"></a>
+### Event: 'logout'
+`function () { }`
+Fired when the cnode disconnects and logout from the Server successfully.  
+
+*************************************************
+<a name="EVT_offline"></a>
+### Event: 'offline'
+`function () { }`
+Fired when the cnode loses its connection to the Server.  
+
+*************************************************
+<a name="EVT_reconnect"></a>
+### Event: 'reconnect'
+`function () { }`
+Fired when the cnode starts to reconnect to the Server..  
 
 *************************************************
 <a name="EVT_announce"></a>
