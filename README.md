@@ -20,14 +20,15 @@ coap-node
 
 [**OMA Lightweight M2M**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) (LWM2M) is a resource constrained device management protocol relies on [**CoAP**](https://tools.ietf.org/html/rfc7252). And **CoAP** is an application layer protocol that allows devices to communicate with each other RESTfully over the Internet.  
 
-**coap-node** is a module that aims to provide a simple way to build M2M/IoT client devices managed by a **coap-shepherd** server. This module follows [**IPSO**](http://www.ipso-alliance.org/smart-object-guidelines/) data model to well organize and define resources on a machine node. 
-
-This module uses [smartobject](https://github.com/PeterEB/smartobject) as its fundamental of resource organizing on devices. **smartobject** can help you create smart objects with IPSO data model, and it also provides a scheme to help you abstract your hardware into smart objects. You may like to use **smartobject** to create many plugins for your own hardware or modules, i.e., temperature sensor, humidity sensor, light control. Here is a [tutorual of how to plan resources](https://github.com/PeterEB/smartobject/blob/master/docs/resource_plan.md) with smartobject.
+* **coap-node** is a module that aims to provide a simple way to build **LWM2M** client devices managed by a **coap-shepherd** server. 
+* It follows most parts of **LWM2M** specification to meet the requirements of a machine network and devices management.
+* It uses [smartobject](https://github.com/PeterEB/smartobject) as its fundamental of resource organizing on devices. **smartobject** can help you create smart objects with IPSO data model, and it also provides a scheme to help you abstract your hardware into smart objects. You may like to use **smartobject** to create many plugins for your own hardware or modules, i.e., temperature sensor, humidity sensor, light control. Here is a [tutorual of how to plan resources](https://github.com/PeterEB/smartobject/blob/master/docs/resource_plan.md) with smartobject.
 
 ###Acronyms and Abbreviations
 
 * **Server**: LWM2M Server (server running with [coap-shepherd](https://github.com/PeterEB/coap-shepherd))  
 * **Client** or **Client Device**: LWM2M Client (machine running with [coap-node](https://github.com/PeterEB/coap-node))  
+* **cnode**: instance of CoapNode Class  
 * oid: identifier of an Object
 * iid: identifier of an Object Instance
 * rid: identifier of a Resource
@@ -68,10 +69,9 @@ so.init('temperature', 0, {
     units: 'C'
 });
 
-// oid = 'temperature', iid = 1
-so.init('temperature', 1, {
-    sensorValue: 70,
-    units: 'F'
+// oid = 'lightCtrl', iid = 0
+so.init('lightCtrl', 0, {
+    onOff: false
 });
 
 /*********************************************/
@@ -101,7 +101,7 @@ cnode.read('/temperature/0/sensorValue', function (err, rsp) {
     console.log(rsp);      // { status: '2.05', data: 21 }
 });
 
-cnode.write('/temperature/1/sensorValue', function (err, rsp) {
+cnode.write('/lightCtrl/0/onOff', true, function (err, rsp) {
     console.log(rsp);      // { status: '2.04' }
 });
 ```
@@ -119,7 +119,7 @@ cnode.write('/temperature/1/sensorValue', function (err, rsp) {
 * Events
     * [registered](#EVT_registered), [deregistered](#EVT_deregistered)
     * [login](#EVT_login), [logout](#EVT_logout), [offline](#EVT_offline), [reconnect](#EVT_reconnect)
-    * [announce](#announce)
+    * [announce](#EVT_announce)
     * [error](#EVT_error)
 
 *************************************************
@@ -191,7 +191,7 @@ SmartObject {
 *************************************************
 <a name="API_register"></a>
 ### register(ip, port[, callback])
-Send a register request to the Server. When succeeds, cnode will fire a 'registered' event and a 'login' event. 
+Send a register request to the Server. When succeeds, cnode will fire a `registered` event and a `login` event. After successfully register, cnode will select a free UDP port to communicate with the Server.
 
 **Arguments:**  
 
@@ -229,7 +229,7 @@ cnode.register('127.0.0.1', 5683, function (err, rsp) {
 *************************************************
 <a name="API_deregister"></a>
 ### deregister([callback])
-Send a deregister request to the Server. The Server will remove the cnode from the registry. When succeeds, cnode will fire a 'deregistered' event and a 'logout' event. 
+Send a deregister request to the Server. The Server will remove the cnode from the registry. When succeeds, cnode will fire a `deregistered` event and a `logout` event. 
 
 **Arguments:**  
 
@@ -263,7 +263,7 @@ cnode.deregister(function (err, rsp) {
 *************************************************
 <a name="API_update"></a>
 ### update(attrs[, callback])
-Set device attributes of the cnode and send an update request to the Server.
+Set device attributes of the cnode and send an update request to the Server. After each successfully update, cnode will change the Client UDP port that communicate with the Server.
 
 **Arguments:**  
 
@@ -302,11 +302,16 @@ cnode.update({ lifetime: 12000 }, function (err, rsp) {
 *************************************************
 <a name="API_checkout"></a>
 ### checkout([duration, ][callback])
-Send a checkout request to inform the Server that cnode is going to sleep. When succeeds, cnode will fire a 'logout' event. 
+Send a checkout request to inform the Server that this cnode is going to sleep. When succeeds, cnode will fire a `logout` event. 
+
+* After received a successful acknowledgement, device can use power saving mode, or even power off.
+* If cnode checks out with a given duration, for example 300 seconds, the Server knows this cnode is going to sleep and expects that this cnode will wake up and check in at 300 seconds later. If cnode does not check in, the Server will take it as an offline Client.
+* If cnode checks out without the duration, the Server knows this cnode is going to sleep but has no idea about when it will wake up and check in again. The Server will always take it as a sleeping Client, until cnode check in.
+* Note: After successfully checkout, cnode will not only stop reporting but also clear all the report settings. The Server should re-issue the observeReq(), when the Client goes online again, if needed.
 
 **Arguments:**  
 
-1. `duration` (_Number_): How many seconds from now that cnode will check in again. 
+1. `duration` (_Number_): How many seconds from now that this cnode will check in again. 
 
 2. `callback` (_Function_): `function (err, rsp) { }`, where `rsp` is the response object with a status code to tell whether this request is successful.  
 
@@ -338,7 +343,7 @@ cnode.checkout(30, function (err, rsp) {
 *************************************************
 <a name="API_checkin"></a>
 ### checkin([callback])
-Send a checkin request to inform the Server that cnode wake up from sleep. When succeeds, cnode will fire a 'login' event. 
+Send a checkin request to inform the Server that this cnode wake up from sleep. When succeeds, cnode will fire a `login` event. 
 
 **Arguments:**  
 

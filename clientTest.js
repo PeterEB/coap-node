@@ -95,14 +95,14 @@ setInterval(function () {
 //     });
 // }, 20000);
 
-setTimeout(function () {
-    coapNode.checkout(10, function (err, rsp) {
-        console.log(rsp);
-    });
-}, 5000);
+// setTimeout(function () {
+//     coapNode.checkout(10, function (err, rsp) {
+//         console.log(rsp);
+//     });
+// }, 5000);
 
-setTimeout(function () {
-    coapNode.checkin(function (err, rsp) {
-        console.log(rsp);
-    });
-}, 15000);
+// setTimeout(function () {
+//     coapNode.checkin(function (err, rsp) {
+//         console.log(rsp);
+//     });
+// }, 15000);
