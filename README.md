@@ -20,9 +20,11 @@ coap-node
 
 [**OMA Lightweight M2M**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) (LWM2M) is a resource constrained device management protocol relies on [**CoAP**](https://tools.ietf.org/html/rfc7252). And **CoAP** is an application layer protocol that allows devices to communicate with each other RESTfully over the Internet.  
 
-**coap-node** is a module that aims to provide a simple way to build **LWM2M** client devices. 
-![coap-shepherd net](https://github.com/PeterEB/coap-shepherd/blob/master/doc/coap_net.png)  
-* It is managed by a **coap-shepherd** server.
+**coap-shepherd** and **coap-node** modules aim to provide a simple way to build and manage a **LWM2M** machine network. 
+![coap-shepherd net](https://github.com/PeterEB/coap-shepherd/blob/master/doc/lwm2m_net.png)  
+### LWM2M Client: coap-node
+
+* It is an implementation of LWM2M Client managed by a **coap-shepherd** Server.
 * It follows most parts of **LWM2M** specification to meet the requirements of a machine network and devices management.
 * It uses [smartobject](https://github.com/PeterEB/smartobject) as its fundamental of resource organizing on devices. **smartobject** can help you create smart objects with IPSO data model, and it also provides a scheme to help you abstract your hardware into smart objects. You may like to use **smartobject** to create many plugins for your own hardware or modules, i.e., temperature sensor, humidity sensor, light control. Here is a [tutorual of how to plan resources](https://github.com/PeterEB/smartobject/blob/master/docs/resource_plan.md) with smartobject.
 
@@ -31,14 +33,15 @@ coap-node
 * **Server**: LWM2M Server (server running with [coap-shepherd](https://github.com/PeterEB/coap-shepherd))  
 * **Client** or **Client Device**: LWM2M Client (machine running with [coap-node](https://github.com/PeterEB/coap-node))  
 * **cnode**: instance of CoapNode Class  
-* oid: identifier of an Object
-* iid: identifier of an Object Instance
-* rid: identifier of a Resource
+* **oid**: identifier of an Object
+* **iid**: identifier of an Object Instance
+* **rid**: identifier of a Resource
+
 
 <a name="Features"></a>
 ## 2. Features
 
-* CoAP protocol  
+* Constrained Application Protocol (CoAP)  
 * Based on [node-coap](https://github.com/mcollina/node-coap), a node.js CoAP client/server library  
 * CoAP services at machine node is off-the-shelf  
 * Hierarchical data model in Smart-Object-style (IPSO) let you easily create Resources on the Client Device  
@@ -54,13 +57,10 @@ coap-node
 
 Client-side example (the following example is how you use `coap-node` on a machine node):
 
+* Step 1: Resources initialzation.
 ```js
-var CoapNode = require('coap-node'),
-    SmartObject = require('smartobject');
+var SmartObject = require('smartobject');
 
-/*********************************************/
-/*   Smart Object: Resources Initialzation   */
-/*********************************************/
 // initialize Resources that follow IPSO definition
 var so = new SmartObject();
 
@@ -75,11 +75,13 @@ so.init('temperature', 0, {
 so.init('lightCtrl', 0, {
     onOff: false
 });
+```
 
-/*********************************************/
-/*   Client Device Initialzation             */
-/*********************************************/
-// Instantiate a machine node with your smart object
+* Step 2: Client device initialzation.
+```js
+var CoapNode = require('coap-node');
+
+// Instantiate a machine node with a client name and your smart object
 var cnode = new CoapNode('my_first_node', so);
 
 cnode.on('registered', function () {
