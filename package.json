@@ -1,7 +1,7 @@
 {
   "name": "coap-node",
   "version": "0.1.4",
-  "description": "An ip-based M2M/IoT client devices managed by a coap-shepherd server.",
+  "description": "Client node of lightweight M2M (LWM2M).",
   "main": "index.js",
   "dependencies": {
     "busyman": "^0.2.1",
