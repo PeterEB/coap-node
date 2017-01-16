@@ -31,7 +31,7 @@ so.init(3303, 1, {
     5701: 'F'
 });
 
-var coapNode = new CoapNode('nodeTest', so);
+var coapNode = new CoapNode('coap-node-test', so);
 
 coapNode.on('registered', function () {
     console.log('registered');
@@ -61,7 +61,7 @@ coapNode.on('error', function (err) {
     console.log(err);
 });
 
-coapNode.register('127.0.0.1', 5683, function (err, rsp) {
+coapNode.register('leshan.eclipse.org', 5683, function (err, rsp) {
     console.log(rsp);
 });
 
