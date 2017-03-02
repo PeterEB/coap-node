@@ -1,5 +1,6 @@
-coap-node
-========================
+# coap-node
+Client node of lightweight M2M (LWM2M).
+
 [![NPM](https://nodei.co/npm/coap-node.png?downloads=true)](https://nodei.co/npm/coap-node/)  
 
 [![Build Status](https://travis-ci.org/PeterEB/coap-node.svg?branch=develop)](https://travis-ci.org/PeterEB/coap-node)
