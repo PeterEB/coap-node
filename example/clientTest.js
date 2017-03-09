@@ -1,4 +1,4 @@
-var CoapNode = require('./index.js'),
+var CoapNode = require('../index.js'),
     SmartObject = require('smartobject');
 
 var so = new SmartObject();
