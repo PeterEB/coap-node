@@ -1,6 +1,6 @@
 var expect = require('chai').expect,
     cutils = require('../lib/components/cutils.js');
-    
+
 describe('cutils', function () {
     describe('Signature Check', function () {
 
@@ -57,11 +57,11 @@ describe('cutils', function () {
         });
 
         it('#.buildUpdateQuery()', function () {
-            
+
         });
 
         it('#.getArrayArgus()', function () {
-            
+
         });
 
         it('#.pathSlashParser()', function () {
@@ -99,7 +99,7 @@ describe('cutils', function () {
             expect(function () { cutils.encodeJsonObj('x', {}); }).not.to.throw();
         });
 
-        it('#.decodeJsonObj()', function () {        
+        it('#.decodeJsonObj()', function () {
             expect(function () { cutils.decodeJsonObj('x', 'y'); }).to.throw();
             expect(function () { cutils.decodeJsonObj('x/y', 'y'); }).to.throw();
             expect(function () { cutils.decodeJsonObj('x', 5); }).to.throw();
@@ -177,11 +177,11 @@ describe('cutils', function () {
         });
 
         it('#.buildUpdateQuery()', function () {
-            
+
         });
 
         it('#.getArrayArgus()', function () {
-            
+
         });
 
         it('#.pathSlashParser()', function () {
@@ -209,6 +209,17 @@ describe('cutils', function () {
             expect(cutils.decodeJsonObj('x', { e: [{ n: '1/0', sv: 'x' }, { n: '1/1', v: 5 }, { n: '2/0', bv: true }] })).to.be.eql({ 1: {  0: 'x', 1: 5 }, 2: {  0: true }});
             expect(cutils.decodeJsonObj('x/y', { e: [{ n: '0', sv: 'x' }, { n: '1', v: 5 }] })).to.be.eql({ 0: 'x', 1: 5 });
             expect(cutils.decodeJsonObj('x/y/z', { e: [{ n: '', v: 5}]})).to.be.eql(5);
+        });
+
+        it('#.encodeTLV()', function () {
+            expect(cutils.encodeTLV('x/y', {0: 'x', 1: true, 203: 5.7})).to.be.eql('c10078c10101c8cb084016cccccccccccd');
+            expect(cutils.encodeTLV('x/y/5700', 6.3)).to.be.eql('e81644084019333333333333');
+        });
+
+        it('#.decodeTLV()', function() {
+            expect(cutils.decodeTLV('x', '080111c10078c801084016666666666666c10201')).to.be.eql({1: { 0: 'x', 1: 5.6, 2: 1}});
+            expect(cutils.decodeTLV('x/y', 'c10078c801084016666666666666c10201')).to.be.eql({0: 'x', 1: 5.6, 2: 1});
+            expect(cutils.decodeTLV('x/y/5700', 'e81644084016666666666666')).to.be.eql(5.6);
         });
     });
 });
