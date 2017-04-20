@@ -47,7 +47,7 @@ describe('coap-node - Functional Check', function() {
 
             node.register('127.0.0.1', 5683, function (err, msg) {
                 var cn;
-                if (msg.status === '2.01' || msg.status === '2.04') {
+                if (msg.status === '2.01') {
                     cn = shepherd.find('utNode');
                     expect(cn._registered).to.be.eql(true);
                 }
@@ -55,23 +55,9 @@ describe('coap-node - Functional Check', function() {
         });
 
         it('should register device again and return msg with status 2.04', function (done) {
-            var devRegHdlr = function (msg) {
-                switch(msg.type) {
-                    case 'devIncoming':
-                        if (msg.cnode.clientName === 'utNode') {
-                            shepherd.removeListener('ind', devRegHdlr);
-                            done(); 
-                        }
-                        break;
-                    default:
-                        break;
-                }
-            };
-
-            shepherd.on('ind', devRegHdlr);
-
             node.register('127.0.0.1', 5683, function (err, msg) {
                 expect(msg.status).to.be.eql('2.04');
+                done();
             });
         });
     });
