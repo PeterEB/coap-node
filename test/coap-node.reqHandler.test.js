@@ -240,7 +240,8 @@ describe('coap-node - reqHandler Check', function() {
 
     describe('#discoverReq', function() {
         it('discover - resource', function (done) {
-            var result = { 
+            var result = {
+                    path: '/3303/0/5700',
                     attrs: { pmin: 0, pmax: 60 }
                 };
 
@@ -256,8 +257,9 @@ describe('coap-node - reqHandler Check', function() {
 
         it('discover - instence', function (done) {
             var result = { 
+                    path: '/3303/0',
                     attrs: { pmin: 0, pmax: 60 },
-                    resrcList: { 0: ['5702', '5703', '5704', '5705', 'sensorValue', 'units'] } 
+                    resrcList: ['/3303/0/5702', '/3303/0/5703', '/3303/0/5704', '/3303/0/5705', '/3303/0/5700', '/3303/0/5701']
                 };
             
             remoteNode.discoverReq('/temperature/0', function (err, msg) {
@@ -272,8 +274,9 @@ describe('coap-node - reqHandler Check', function() {
 
         it('discover - object', function (done) {
             var result = { 
+                    path: '/3303',
                     attrs: { pmin: 0, pmax: 60 },
-                    resrcList: { 0: ['5702', '5703', '5704', '5705', 'sensorValue', 'units'] } 
+                    resrcList: ['/3303/0/5702', '/3303/0/5703', '/3303/0/5704', '/3303/0/5705', '/3303/0/5700', '/3303/0/5701']
                 };
             
             remoteNode.discoverReq('/temperature', function (err, msg) {
