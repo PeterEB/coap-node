@@ -61,13 +61,13 @@ coapNode.on('error', function (err) {
     console.log(err);
 });
 
-coapNode.register('leshan.eclipse.org', 5683, function (err, rsp) {
-    console.log(rsp);
-});
-
-// coapNode.register('127.0.0.1', 5683, function (err, rsp) {
+// coapNode.register('leshan.eclipse.org', 5683, function (err, rsp) {
 //     console.log(rsp);
 // });
+
+coapNode.register('127.0.0.1', 5683, function (err, rsp) {
+    console.log(rsp);
+});
 
 // setInterval(function () {
 //     so.read(3303, 0, 5702, function () {});
