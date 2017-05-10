@@ -24,10 +24,10 @@ describe('coap-node - Constructor Check', function () {
                             manuf: 'sivann',            // rid = 0
                             model: 'cnode-01',          // rid = 1
                             serial: 'c-0000',           // rid = 2
-                            firmware: 'v1.0',           // rid = 3
+                            firmware: '1.0',           // rid = 3
                             devType: 'generic',         // rid = 17
-                            hwVer: 'v1.0',              // rid = 18
-                            swVer: 'v1.0',              // rid = 19
+                            hwVer: '1.0',              // rid = 18
+                            swVer: '1.0',              // rid = 19
                             availPwrSrc:'unknown',
                             pwrSrcVoltage: 'unknown'
                         }

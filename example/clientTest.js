@@ -31,7 +31,7 @@ so.init(3303, 1, {
     5701: 'F'
 });
 
-var coapNode = new CoapNode('coap-node-test', so);
+var coapNode = new CoapNode('coap-node-test', so, { lifetime: 300 });
 
 coapNode.on('registered', function () {
     console.log('registered');
@@ -61,13 +61,17 @@ coapNode.on('error', function (err) {
     console.log(err);
 });
 
-coapNode.register('127.0.0.1', 5683, function (err, rsp) {
+coapNode.register('leshan.eclipse.org', 5683, function (err, rsp) {
     console.log(rsp);
 });
 
-setInterval(function () {
-    so.read(3303, 0, 5702, function () {});
-}, 3000);
+// coapNode.register('127.0.0.1', 5683, function (err, rsp) {
+//     console.log(rsp);
+// });
+
+// setInterval(function () {
+//     so.read(3303, 0, 5702, function () {});
+// }, 3000);
 
 // setTimeout(function () {
 //     coapNode.register('127.0.0.1', 5683, function (err, rsp) {
