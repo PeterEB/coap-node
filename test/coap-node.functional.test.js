@@ -54,9 +54,9 @@ describe('coap-node - Functional Check', function() {
             });
         });
 
-        it('should register device again and return msg with status 2.04', function (done) {
+        it('should register device again and return msg with status 2.01', function (done) {
             node.register('127.0.0.1', 5683, function (err, msg) {
-                expect(msg.status).to.be.eql('2.04');
+                expect(msg.status).to.be.eql('2.01');
                 done();
             });
         });

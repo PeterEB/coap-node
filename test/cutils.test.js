@@ -196,18 +196,5 @@ describe('cutils', function () {
             expect(cutils.getPathIdKey('/1/2/defaultMaxPeriod')).to.be.eql({ oid: 'lwm2mServer', iid: 2, rid: 'defaultMaxPeriod' });
             expect(cutils.getPathIdKey('/lwm2mServer/2/defaultMaxPeriod')).to.be.eql({ oid: 'lwm2mServer', iid: 2, rid: 'defaultMaxPeriod' });
         });
-
-        it('#.encodeJson()', function () {
-            expect(cutils.encodeJson('x', { 1: {  0: 'x', 1: 5 }, 2: {  0: true, 1: 0 }})).to.be.eql({ bn: '/x', e: [{ n: '1/0', sv: 'x' }, { n: '1/1', v: 5 }, { n: '2/0', bv: true }, { n:'2/1', v: 0}] });
-            expect(cutils.encodeJson('x/y', { 0: 'x', 1: 5, 2: new Date(100000) })).to.be.eql({ bn: '/x/y', e: [{ n: '0', sv: 'x' }, { n: '1', v: 5 }, { n: '2', v: 100000 }] });
-            expect(cutils.encodeJson('x/y/z', 5)).to.be.eql({ bn: '/x/y/z', e: [{ n: '', v: 5}]});
-            expect(cutils.encodeJson('x/y/z', new Date(100000))).to.be.eql({ bn: '/x/y/z', e: [{ n: '', v: 100000}]});
-        });
-
-        it('#.decodeJson()', function () {
-            expect(cutils.decodeJson('x', { e: [{ n: '1/0', sv: 'x' }, { n: '1/1', v: 5 }, { n: '2/0', bv: true }] })).to.be.eql({ 1: {  0: 'x', 1: 5 }, 2: {  0: true }});
-            expect(cutils.decodeJson('x/y', { e: [{ n: '0', sv: 'x' }, { n: '1', v: 5 }] })).to.be.eql({ 0: 'x', 1: 5 });
-            expect(cutils.decodeJson('x/y/z', { e: [{ n: '', v: 5}]})).to.be.eql(5);
-        });
     });
 });
