@@ -1,6 +1,6 @@
 {
   "name": "coap-node",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Client node of lightweight M2M (LWM2M).",
   "main": "index.js",
   "dependencies": {
@@ -14,7 +14,7 @@
   },
   "devDependencies": {
     "chai": "^3.5.0",
-    "coap-shepherd": "^0.2.1",
+    "coap-shepherd": "^0.2.2",
     "mocha": "^2.5.3"
   },
   "scripts": {
