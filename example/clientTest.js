@@ -31,6 +31,10 @@ so.init(3303, 1, {
     5701: 'F'
 });
 
+so.init(3312, 0, {
+    5850: false,
+});
+
 var coapNode = new CoapNode('coap-node-test', so, { lifetime: 300 });
 
 coapNode.on('registered', function () {
