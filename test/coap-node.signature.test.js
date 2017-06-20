@@ -11,14 +11,6 @@ describe('coap-node - Constructor Check', function () {
     describe('CoapNode', function () {
         it('should throw TypeError if attrs is not correct', function (done) {
             var defSo = {
-                    lwm2mServer: {
-                        0: {  // oid = 1
-                            shortServerId: 'unknown',        
-                            lifetime: 86400,   
-                            defaultMinPeriod: 0,       
-                            defaultMaxPeriod: 60        
-                        }
-                    },
                     device: {
                         0: {       // oid = 3
                             manuf: 'sivann',            // rid = 0
@@ -86,8 +78,6 @@ describe('coap-node - Signature Check', function () {
             expect(function () { return new CoapNode(true); }).to.throw(TypeError);
             expect(function () { return new CoapNode(new Date()); }).to.throw(TypeError);
             expect(function () { return new CoapNode(function () {}); }).to.throw(TypeError);
-
-            expect(function () { return new CoapNode('xxx', so); }).not.to.throw(TypeError);
         });
     });
 
