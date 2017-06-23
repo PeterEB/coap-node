@@ -69,25 +69,9 @@ coapNode.on('error', function (err) {
     console.log(err);
 });
 
-// coapNode.register('leshan.eclipse.org', 5683, function (err, rsp) {
-//     console.log(rsp);
-// });
-
 coapNode.bootstrap('leshan.eclipse.org', 5783, function (err, rsp) {
     console.log(rsp);
 });
-
-// setTimeout(function () {
-//     coapNode.register('127.0.0.1', 5683, function (err, rsp) {
-//         console.log(rsp);
-//     });
-// }, 5000);
-
-// setTimeout(function () {
-//     coapNode.register('127.0.0.1', 5683, function (err, rsp) {
-//         console.log(rsp);
-//     });
-// }, 10000);
 
 // update test
 // setTimeout(function () {
