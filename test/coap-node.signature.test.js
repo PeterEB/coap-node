@@ -20,8 +20,8 @@ describe('coap-node - Constructor Check', function () {
                             devType: 'generic',         // rid = 17
                             hwVer: '1.0',              // rid = 18
                             swVer: '1.0',              // rid = 19
-                            availPwrSrc:'unknown',
-                            pwrSrcVoltage: 'unknown'
+                            availPwrSrc: 0,
+                            pwrSrcVoltage: 100
                         }
                     },
                     connMonitor: {
