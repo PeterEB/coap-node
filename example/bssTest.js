@@ -39,6 +39,7 @@ var coapNode = new CoapNode('coap-node-bbstest', so, { lifetime: 300 });
 
 coapNode.on('bootstrapped', function () {
     console.log('bootstrapped');
+    console.log(coapNode.so);
 });
 
 coapNode.on('registered', function () {
