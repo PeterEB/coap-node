@@ -45,7 +45,8 @@ describe('coap-node - Functional Check', function() {
 
             shepherd.on('ind', devRegHdlr);
 
-            node.register('127.0.0.1', 5683, function (err, msg) {
+            node.configure('127.0.0.1', 5683);
+            node.register(function (err, msg) {
                 var cn;
                 if (msg.status === '2.01') {
                     cn = shepherd.find('utNode');
@@ -55,7 +56,7 @@ describe('coap-node - Functional Check', function() {
         });
 
         it('should register device again and return msg with status 2.01', function (done) {
-            node.register('127.0.0.1', 5683, function (err, msg) {
+            node.register(function (err, msg) {
                 expect(msg.status).to.be.eql('2.01');
                 done();
             });

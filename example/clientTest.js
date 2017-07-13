@@ -65,8 +65,8 @@ coapNode.on('error', function (err) {
     console.log(err);
 });
 
-// coapNode.configure('leshan.eclipse.org', 5683);
-coapNode.configure('127.0.0.1', 5683);
+coapNode.configure('leshan.eclipse.org', 5683);
+// coapNode.configure('127.0.0.1', 5683);
 
 coapNode.register(function (err, rsp) {
     console.log(rsp);
