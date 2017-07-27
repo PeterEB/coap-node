@@ -45,6 +45,12 @@ describe('coap-node - reqHandler Check', function() {
     this.timeout(5000);
 
     before(function (done) {
+        try {
+            fs.unlinkSync(path.resolve('./node_modules/coap-shepherd/lib/database/coap.db'));
+        } catch (e) {
+            console.log(e);
+        }
+
         shepherd.start(function () {
             shepherd.permitJoin(300);
 
@@ -64,7 +70,14 @@ describe('coap-node - reqHandler Check', function() {
 
             shepherd.on('ind', devRegHdlr);
 
-            node.register('127.0.0.1', 5683, function (err, msg) {});
+            node.configure('127.0.0.1', 5683);
+            node.register(function (err, msg) {
+                var cn;
+                if (msg[0].status === '2.01') {
+                    cn = shepherd.find('utNode');
+                    expect(cn._registered).to.be.eql(true);
+                }
+            });
         });
     });
 
@@ -491,7 +504,7 @@ describe('coap-node - reqHandler Check', function() {
         node.deregister(function (err, msg) {
             if (err) { 
                 console.log(err);
-            } else if (msg.status === '2.02') {
+            } else if (msg[0].status === '2.02') {
                 shepherd.stop(function () {
                     done();
                 });

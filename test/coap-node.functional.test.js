@@ -11,16 +11,16 @@ var so = new SmartObject();
 
 var node = new CoapNode('utNode', so);
 
-try {
-    fs.unlinkSync(path.resolve('./node_modules/coap-shepherd/lib/database/coap.db'));
-} catch (e) {
-    console.log(e);
-}
-
 describe('coap-node - Functional Check', function() {
-    // this.timeout(15000);
+    this.timeout(15000);
 
     before(function (done) {
+        try {
+            fs.unlinkSync(path.resolve('./node_modules/coap-shepherd/lib/database/coap.db'));
+        } catch (e) {
+            console.log(e);
+        }
+
         shepherd.start(function () {
             done();
         });
@@ -48,7 +48,7 @@ describe('coap-node - Functional Check', function() {
             node.configure('127.0.0.1', 5683);
             node.register(function (err, msg) {
                 var cn;
-                if (msg.status === '2.01') {
+                if (msg[0].status === '2.01') {
                     cn = shepherd.find('utNode');
                     expect(cn._registered).to.be.eql(true);
                 }
@@ -57,7 +57,7 @@ describe('coap-node - Functional Check', function() {
 
         it('should register device again and return msg with status 2.01', function (done) {
             node.register(function (err, msg) {
-                expect(msg.status).to.be.eql('2.01');
+                expect(msg[0].status).to.be.eql('2.01');
                 done();
             });
         });
@@ -82,7 +82,7 @@ describe('coap-node - Functional Check', function() {
             shepherd.on('ind', devUpdateHdlr);
 
             node.update({ lifetime: 60000 }, function (err, msg) {
-                if (msg.status === '2.04') {
+                if (msg[0].status === '2.04') {
                     expect(node.lifetime).to.be.eql(60000);
                 }
             });
@@ -90,7 +90,7 @@ describe('coap-node - Functional Check', function() {
 
         it('should update device port and return msg with status 2.04', function (done) {
             node.update({}, function (err, msg) {
-                if (msg.status === '2.04') {
+                if (msg[0].status === '2.04') {
                     done();
                 }
             });
@@ -98,7 +98,7 @@ describe('coap-node - Functional Check', function() {
 
         it('should return msg with status 4.00 when the attrs is bad', function (done) {
             node.update({ name: 'peter' }, function (err, msg) {
-                if (msg.status === '4.00') {
+                if (err) {
                     done();
                 }
             });
@@ -108,7 +108,7 @@ describe('coap-node - Functional Check', function() {
     describe('#.checkout()', function () {
         it('should chect out and _sleep will be true', function (done) {
             node.checkout(function (err, msg) {
-                if (msg.status === '2.04') {
+                if (msg[0].status === '2.04') {
                     expect(node._sleep).to.be.eql(true);
                     done();
                 }
@@ -117,7 +117,7 @@ describe('coap-node - Functional Check', function() {
 
         it('should chect out and _sleep will be true with duration', function (done) {
             node.checkout(10, function (err, msg) {
-                if (msg.status === '2.04') {
+                if (msg[0].status === '2.04') {
                     expect(node._sleep).to.be.eql(true);
                     done();
                 }
@@ -128,7 +128,7 @@ describe('coap-node - Functional Check', function() {
     describe('#.checkin()', function () {
         it('should chect in and _sleep will be false', function (done) {
             node.checkin(function (err, msg) {
-                if (msg.status === '2.04') {
+                if (msg[0].status === '2.04') {
                     expect(node._sleep).to.be.eql(false);
                     done();
                 }
@@ -158,13 +158,13 @@ describe('coap-node - Functional Check', function() {
             shepherd.on('ind', devDeregHdlr);
 
             node.deregister(function (err, msg) {
-                expect(msg.status).to.be.eql('2.02');
+                expect(msg[0].status).to.be.eql('2.02');
             });
         });
 
         it('should return msg with status 4.04 when the device is not registered', function (done) {
             node.deregister(function (err, msg) {
-                if (msg.status === '4.04') {
+                if (msg[0].status === '4.04') {
                     done();
                 }
             });
@@ -172,7 +172,7 @@ describe('coap-node - Functional Check', function() {
 
         it('should return msg with status 4.04 when the device is not registered', function (done) {
             node.update({ lifetime: 12000 }, function (err, msg) {
-                if (msg.status === '4.04') {
+                if (msg[0].status === '4.04') {
                     done();
                 }
             });

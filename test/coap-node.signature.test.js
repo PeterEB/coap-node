@@ -38,20 +38,9 @@ describe('coap-node - Constructor Check', function () {
             expect(node.version).to.be.eql('1.0.0');  
             expect(node.ip).to.be.eql('unknown');
             expect(node.port).to.be.eql('unknown');
-            
-            expect(node._serverIp).to.be.eql('unknown');
-            expect(node._serverPort).to.be.eql('unknown');
-
+            expect(node.servers).to.be.eql({});
+            expect(node.serversInfo).to.be.eql({});
             expect(node.objList).to.be.eql(null);
-
-            expect(node._registered).to.be.false;
-            expect(node._lfsecs).to.be.eql(0);
-            expect(node._updater).to.be.eql(null);
-            expect(node._repAttrs).to.be.eql({});
-            expect(node._reporters).to.be.eql({});
-            expect(node._hbPacemaker).to.be.eql(null);
-            expect(node._reporters).to.be.eql({});
-            expect(node._hbPacemaker).to.be.eql(null);
 
             node.so.dump(function (err, data) {
                 if (err) {
@@ -81,6 +70,60 @@ describe('coap-node - Signature Check', function () {
         });
     });
 
+    describe('#.bootstrap()', function () {
+        it('should throw TypeError if ip is not a string', function () {
+            expect(function () { return node.bootstrap(); }).to.throw(TypeError);
+            expect(function () { return node.bootstrap(undefined, '1'); }).to.throw(TypeError);
+            expect(function () { return node.bootstrap(null, '1'); }).to.throw(TypeError);
+            expect(function () { return node.bootstrap(NaN, '1'); }).to.throw(TypeError);
+            expect(function () { return node.bootstrap(100, '1'); }).to.throw(TypeError);
+            expect(function () { return node.bootstrap([], '1'); }).to.throw(TypeError);
+            expect(function () { return node.bootstrap({}, '1'); }).to.throw(TypeError);
+            expect(function () { return node.bootstrap(true, '1'); }).to.throw(TypeError);
+            expect(function () { return node.bootstrap(new Date(), '1'); }).to.throw(TypeError);
+            expect(function () { return node.bootstrap(function () {}, '1'); }).to.throw(TypeError);
+        });
+
+        it('should throw TypeError if port is not a string or a number', function () {
+            expect(function () { return node.bootstrap('192.168.1.1'); }).to.throw(TypeError);
+            expect(function () { return node.bootstrap('192.168.1.1', undefined); }).to.throw(TypeError);
+            expect(function () { return node.bootstrap('192.168.1.1', null); }).to.throw(TypeError);
+            expect(function () { return node.bootstrap('192.168.1.1', NaN); }).to.throw(TypeError);
+            expect(function () { return node.bootstrap('192.168.1.1', []); }).to.throw(TypeError);
+            expect(function () { return node.bootstrap('192.168.1.1', {}); }).to.throw(TypeError);
+            expect(function () { return node.bootstrap('192.168.1.1', true); }).to.throw(TypeError);
+            expect(function () { return node.bootstrap('192.168.1.1', new Date()); }).to.throw(TypeError);
+            expect(function () { return node.bootstrap('192.168.1.1', function () {}); }).to.throw(TypeError);
+        });
+    });
+
+    describe('#.configure()', function () {
+        it('should throw TypeError if ip is not a string', function () {
+            expect(function () { return node.configure(); }).to.throw(TypeError);
+            expect(function () { return node.configure(undefined, '1'); }).to.throw(TypeError);
+            expect(function () { return node.configure(null, '1'); }).to.throw(TypeError);
+            expect(function () { return node.configure(NaN, '1'); }).to.throw(TypeError);
+            expect(function () { return node.configure(100, '1'); }).to.throw(TypeError);
+            expect(function () { return node.configure([], '1'); }).to.throw(TypeError);
+            expect(function () { return node.configure({}, '1'); }).to.throw(TypeError);
+            expect(function () { return node.configure(true, '1'); }).to.throw(TypeError);
+            expect(function () { return node.configure(new Date(), '1'); }).to.throw(TypeError);
+            expect(function () { return node.configure(function () {}, '1'); }).to.throw(TypeError);
+        });
+
+        it('should throw TypeError if port is not a string or a number', function () {
+            expect(function () { return node.configure('192.168.1.1'); }).to.throw(TypeError);
+            expect(function () { return node.configure('192.168.1.1', undefined); }).to.throw(TypeError);
+            expect(function () { return node.configure('192.168.1.1', null); }).to.throw(TypeError);
+            expect(function () { return node.configure('192.168.1.1', NaN); }).to.throw(TypeError);
+            expect(function () { return node.configure('192.168.1.1', []); }).to.throw(TypeError);
+            expect(function () { return node.configure('192.168.1.1', {}); }).to.throw(TypeError);
+            expect(function () { return node.configure('192.168.1.1', true); }).to.throw(TypeError);
+            expect(function () { return node.configure('192.168.1.1', new Date()); }).to.throw(TypeError);
+            expect(function () { return node.configure('192.168.1.1', function () {}); }).to.throw(TypeError);
+        });
+    });
+
     describe('#.update()', function () {
         it('should throw TypeError if attrs is not a number', function () {
             expect(function () { return node.update(); }).to.throw(TypeError);
@@ -95,33 +138,6 @@ describe('coap-node - Signature Check', function () {
             expect(function () { return node.update(function () {}); }).to.throw(TypeError);
 
             expect(function () { return node.update({}); }).not.to.throw(TypeError);
-        });
-    });
-
-    describe('#.register()', function () {
-        it('should throw TypeError if ip is not a string', function () {
-            expect(function () { return node.register(); }).to.throw(TypeError);
-            expect(function () { return node.register(undefined, '1'); }).to.throw(TypeError);
-            expect(function () { return node.register(null, '1'); }).to.throw(TypeError);
-            expect(function () { return node.register(NaN, '1'); }).to.throw(TypeError);
-            expect(function () { return node.register(100, '1'); }).to.throw(TypeError);
-            expect(function () { return node.register([], '1'); }).to.throw(TypeError);
-            expect(function () { return node.register({}, '1'); }).to.throw(TypeError);
-            expect(function () { return node.register(true, '1'); }).to.throw(TypeError);
-            expect(function () { return node.register(new Date(), '1'); }).to.throw(TypeError);
-            expect(function () { return node.register(function () {}, '1'); }).to.throw(TypeError);
-        });
-
-        it('should throw TypeError if ip is not a string or a number', function () {
-            expect(function () { return node.register('192.168.1.1'); }).to.throw(TypeError);
-            expect(function () { return node.register('192.168.1.1', undefined); }).to.throw(TypeError);
-            expect(function () { return node.register('192.168.1.1', null); }).to.throw(TypeError);
-            expect(function () { return node.register('192.168.1.1', NaN); }).to.throw(TypeError);
-            expect(function () { return node.register('192.168.1.1', []); }).to.throw(TypeError);
-            expect(function () { return node.register('192.168.1.1', {}); }).to.throw(TypeError);
-            expect(function () { return node.register('192.168.1.1', true); }).to.throw(TypeError);
-            expect(function () { return node.register('192.168.1.1', new Date()); }).to.throw(TypeError);
-            expect(function () { return node.register('192.168.1.1', function () {}); }).to.throw(TypeError);
         });
     });
 
