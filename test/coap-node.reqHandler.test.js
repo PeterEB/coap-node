@@ -69,7 +69,7 @@ describe('coap-node - reqHandler Check', function() {
                 };
 
             shepherd.on('ind', devRegHdlr);
-
+            
             node.configure('127.0.0.1', 5683);
             node.register(function (err, msg) {
                 var cn;
