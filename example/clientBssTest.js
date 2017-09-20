@@ -39,7 +39,6 @@ var coapNode = new CoapNode('coap-node-bbstest', so, { lifetime: 300 });
 
 coapNode.on('bootstrapped', function () {
     console.log('bootstrapped');
-    console.log(coapNode.so);
 });
 
 coapNode.on('registered', function () {
@@ -70,7 +69,7 @@ coapNode.on('error', function (err) {
     console.log(err);
 });
 
-coapNode.bootstrap('leshan.eclipse.org', 5783, function (err, rsp) {
+coapNode.bootstrap('127.0.0.1', 5783, function (err, rsp) {
     console.log(rsp);
 });
 
