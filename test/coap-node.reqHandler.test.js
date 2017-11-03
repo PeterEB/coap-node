@@ -72,7 +72,7 @@ describe('coap-node - reqHandler Check', function() {
             
             node.register('127.0.0.1', 5683, function (err, msg) {
                 var cn;
-                if (msg[0].status === '2.01') {
+                if (msg.status === '2.01') {
                     cn = shepherd.find('utNode');
                     expect(cn._registered).to.be.eql(true);
                 }
