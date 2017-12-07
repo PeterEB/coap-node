@@ -39,6 +39,10 @@ var coapNode = new CoapNode('coap-node-bbstest', so, { lifetime: 300 });
 
 coapNode.on('bootstrapped', function () {
     console.log('bootstrapped');
+
+    coapNode.registerAllCfg(function (err, rsp) {
+        console.log(rsp);
+    });
 });
 
 coapNode.on('registered', function () {
@@ -69,7 +73,7 @@ coapNode.on('error', function (err) {
     console.log(err);
 });
 
-coapNode.bootstrap(1, '127.0.0.1', 5783, function (err, rsp) {
+coapNode.bootstrap('127.0.0.1', 5783, function (err, rsp) {
     console.log(rsp);
 });
 
@@ -78,14 +82,14 @@ coapNode.bootstrap(1, '127.0.0.1', 5783, function (err, rsp) {
 //     coapNode.update({ lifetime: 85741 }, function (err, rsp) {
 //         console.log(rsp);
 //     });
-// }, 15000);
+// }, 10000);
 
-// // deregister test
-// setTimeout(function () {
-//     coapNode.deregister(function (err, rsp) {
-//         console.log(rsp);
-//     });
-// }, 20000);
+// deregister test
+setTimeout(function () {
+    coapNode.deregister(function (err, rsp) {
+        console.log(rsp);
+    });
+}, 20000);
 
 // setTimeout(function () {
 //     coapNode.checkout(10, function (err, rsp) {
