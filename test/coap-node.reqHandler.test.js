@@ -503,7 +503,7 @@ describe('coap-node - reqHandler Check', function() {
         node.deregister(function (err, msg) {
             if (err) { 
                 console.log(err);
-            } else if (msg[0].status === '2.02') {
+            } else if (msg.status === '2.02') {
                 shepherd.stop(function () {
                     done();
                 });
