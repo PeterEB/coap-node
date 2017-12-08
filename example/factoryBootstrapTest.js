@@ -35,15 +35,7 @@ so.init(3312, 0, {
     5850: false,
 });
 
-var coapNode = new CoapNode('coap-node-bbstest', so, { lifetime: 300 });
-
-coapNode.on('bootstrapped', function () {
-    console.log('bootstrapped');
-
-    coapNode.registerAllCfg(function (err, rsp) {
-        console.log(rsp);
-    });
-});
+var coapNode = new CoapNode('coap-node-test', so, { lifetime: 300 });
 
 coapNode.on('registered', function () {
     console.log('registered');
@@ -51,14 +43,6 @@ coapNode.on('registered', function () {
 
 coapNode.on('deregistered', function (msg) {
     console.log('deregistered');
-});
-
-coapNode.on('login', function (msg) {
-    console.log('login');
-});
-
-coapNode.on('logout', function (msg) {
-    console.log('logout');
 });
 
 coapNode.on('offline', function (msg) {
@@ -73,23 +57,42 @@ coapNode.on('error', function (err) {
     console.log(err);
 });
 
-coapNode.bootstrap('127.0.0.1', 5783, function (err, rsp) {
+coapNode.configure('leshan.eclipse.org', 5683);
+coapNode.configure('127.0.0.1', 5683);
+
+coapNode.registerAllCfg(function (err, rsp) {
     console.log(rsp);
 });
+
+setInterval(function () {
+    so.read(3303, 0, 5702, function () {});
+}, 3000);
+
+// setTimeout(function () {
+//     coapNode.register('127.0.0.1', 5683, function (err, rsp) {
+//         console.log(rsp);
+//     });
+// }, 5000);
+
+// setTimeout(function () {
+//     coapNode.register('127.0.0.1', 5683, function (err, rsp) {
+//         console.log(rsp);
+//     });
+// }, 10000);
 
 // update test
 // setTimeout(function () {
 //     coapNode.update({ lifetime: 85741 }, function (err, rsp) {
 //         console.log(rsp);
 //     });
-// }, 10000);
+// }, 15000);
 
-// deregister test
-setTimeout(function () {
-    coapNode.deregister(function (err, rsp) {
-        console.log(rsp);
-    });
-}, 20000);
+// // deregister test
+// setTimeout(function () {
+//     coapNode.deregister(function (err, rsp) {
+//         console.log(rsp);
+//     });
+// }, 20000);
 
 // setTimeout(function () {
 //     coapNode.checkout(10, function (err, rsp) {

@@ -31,6 +31,8 @@ Please visit the [Wiki](https://github.com/PeterEB/coap-node/wiki).
 
 * It is an implementation of LWM2M Client managed by a **coap-shepherd** Server.
 * It follows most parts of **LWM2M** specification to meet the requirements of a machine network and devices management.
+* It support mulitple servers.
+* It support factory bootstrap and client initiated bootstrap. 
 * It uses [smartobject](https://github.com/PeterEB/smartobject) as its fundamental of resource organizing on devices. **smartobject** can help you create smart objects with IPSO data model, and it also provides a scheme to help you abstract your hardware into smart objects. You may like to use **smartobject** to create many plugins for your own hardware or modules, i.e., temperature sensor, humidity sensor, light control. Here is a [tutorual of how to plan resources](https://github.com/PeterEB/smartobject/blob/master/docs/resource_plan.md) with smartobject.
 
 <br />
