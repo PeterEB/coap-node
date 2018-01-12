@@ -35,7 +35,7 @@ describe('coap-node - Constructor Check', function () {
             expect(node.clientName).to.be.eql('utNode');
             expect(node.locationPath).to.be.eql('unknown');
             expect(node.lifetime).to.be.eql(86400);
-            expect(node.version).to.be.eql('1.0.0');  
+            expect(node.version).to.be.eql('1.0');  
             expect(node.ip).to.be.eql('unknown');
             expect(node.port).to.be.eql('unknown');
             expect(node.servers).to.be.eql({});
