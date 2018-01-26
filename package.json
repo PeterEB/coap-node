@@ -1,20 +1,20 @@
 {
   "name": "coap-node",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "description": "Client node of lightweight M2M (LWM2M).",
   "main": "index.js",
   "dependencies": {
     "busyman": "^0.3.0",
     "coap": "^0.17.0",
     "debug": "^2.2.0",
-    "lwm2m-codec": "0.0.9",
+    "lwm2m-codec": "0.1.1",
     "lwm2m-id": "^1.6.1",
     "network": "^0.2.1",
     "smartobject": "^1.4.3"
   },
   "devDependencies": {
     "chai": "^3.5.0",
-    "coap-shepherd": "^0.2.7",
+    "coap-shepherd": "^0.2.8",
     "mocha": "^2.5.3"
   },
   "scripts": {

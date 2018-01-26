@@ -35,7 +35,7 @@ so.init(3312, 0, {
     5850: false,
 });
 
-var coapNode = new CoapNode('coap-node-bbstest', so, { lifetime: 300 });
+var coapNode = new CoapNode('coap-node-test', so, { lifetime: 300 });
 
 coapNode.on('bootstrapped', function () {
     console.log('bootstrapped');
@@ -64,7 +64,11 @@ coapNode.on('error', function (err) {
     console.log(err);
 });
 
-coapNode.bootstrap('leshan.eclipse.org', 5783, function (err, rsp) {
+// coapNode.bootstrap('leshan.eclipse.org', 5783, function (err, rsp) {
+//     console.log(rsp);
+// });
+
+coapNode.bootstrap('127.0.0.1', 5783, function (err, rsp) {
     console.log(rsp);
 });
 
