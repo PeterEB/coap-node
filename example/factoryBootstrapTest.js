@@ -58,15 +58,15 @@ coapNode.on('error', function (err) {
 });
 
 coapNode.configure('leshan.eclipse.org', 5683);
-coapNode.configure('192.168.4.1', 5683);
+coapNode.configure('127.0.0.1', 5683);
 
 coapNode.registerAllCfg(function (err, rsp) {
     console.log(rsp);
 });
 
-setInterval(function () {
-    so.read(3303, 0, 5702, function () {});
-}, 3000);
+// setInterval(function () {
+//     so.read(3303, 0, 5702, function () {});
+// }, 3000);
 
 // setTimeout(function () {
 //     coapNode.register('127.0.0.1', 5683, function (err, rsp) {
@@ -82,7 +82,7 @@ setInterval(function () {
 
 // update test
 // setTimeout(function () {
-//     coapNode.update({ lifetime: 85741 }, function (err, rsp) {
+//     coapNode.update({ lifetime: 12000 }, function (err, rsp) {
 //         console.log(rsp);
 //     });
 // }, 15000);
